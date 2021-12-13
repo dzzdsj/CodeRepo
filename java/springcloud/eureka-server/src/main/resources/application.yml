@@ -1,0 +1,13 @@
+server:
+  port: 1111
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    #禁止自己当做服务注册
+    register-with-eureka: false
+    #屏蔽注册信息,不检索服务
+    fetch-registry: false
+    service-url:
+      #注册中心地址
+      defaultZone: http://${eureka.instance.hostname:}:${server.port}/eureka/
