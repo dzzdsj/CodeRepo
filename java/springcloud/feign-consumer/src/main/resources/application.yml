@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: feign-consumer
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    service-url:
+      #      defaultZone: http://peer1:1111/eureka/,http://peer2:1112/eureka/
+      defaultZone: http://${eureka.instance.hostname}:1111/eureka/
+server:
+  port: 9001
+
+HELLO-SERVICE:
+  ribbon:
+    ConnectTimeout: 500
+    #ribbon的超时时间，需要小于hystrix的超时时间，不然直接熔断了，不会触发重试机制
+    ReadTimeout: 2000
+    OkToRetryOnAllOperations: true
+    # 更换实例访问次数
+    MaxAutoRetriesNextServer: 2
+    # 尝试访问首选实例次数
+    MaxAutoRetries: 1
