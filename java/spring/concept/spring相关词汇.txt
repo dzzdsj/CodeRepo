@@ -1,0 +1,4 @@
+
+POJO(Plain Old Java Object)     简单java对象
+(IoC)Inversion of control       控制反转
+

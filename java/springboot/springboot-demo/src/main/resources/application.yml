@@ -1,0 +1,11 @@
+logging:
+  file:
+    name: BookWorm.log
+    path: D:/logs/springbootdemo
+  level:
+    root: WARN
+    org:
+      springframework:
+        security: DEBUG
+  config:
+    classpath: logback-dev.xml
