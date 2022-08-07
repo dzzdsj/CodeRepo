@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="house" class="com.dzzdsj.demo.springdemo.ioc.inject.construct.xmlconfig.House">
+        <constructor-arg name="houseId" value="0001"></constructor-arg>
+<!-- 需要待注入的类有正确的构造函数       -->
+        <constructor-arg name="door" ref="door"></constructor-arg>
+    </bean>
+    <bean id="door" class="com.dzzdsj.demo.springdemo.ioc.inject.construct.xmlconfig.Door">
+        <property name="id" value="001"></property>
+        <property name="productAddress" value="abc street"></property>
+    </bean>
+</beans>

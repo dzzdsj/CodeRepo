@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="student" class="com.dzzdsj.demo.springdemo.ioc.inject.setter.xmlconfig.Student">
+<!--property属性注入，即setter注入方式，需要对应的类具有setter方法        -->
+        <property name="name" value="tom"></property>
+        <property name="age" value="11"></property>
+<!--ref引用其他的bean        -->
+        <property name="idCard" ref="iDCard"></property>
+    </bean>
+    <bean id="iDCard" class="com.dzzdsj.demo.springdemo.ioc.inject.setter.xmlconfig.IDCard">
+        <property name="cardNumber" value="001"></property>
+        <property name="isValid" value="1"></property>
+    </bean>
+</beans>
