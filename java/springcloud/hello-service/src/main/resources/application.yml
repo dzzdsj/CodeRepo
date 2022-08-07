@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: hello-service
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:1111/eureka/
+  profiles: test
+server:
+  port: 8000
+#可以在单个yml文件中定义不同环境的配置，用---分隔再用spring.profiles 指定。
+---
+spring:
+  application:
+    name: hello-service
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:1111/eureka/
+  profiles: prod
+server:
+  port: 8088
