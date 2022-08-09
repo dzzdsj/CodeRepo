@@ -1,10 +1,15 @@
 package com.dzzdsj.demo.springdemo.ioc.inject.construct.javaconfig;
 
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Data
+@Component("window")
 public class Window {
+    @Value("101")
     private int id;
+    @Value("good window")
     private String name;
 
     public int getId() {
