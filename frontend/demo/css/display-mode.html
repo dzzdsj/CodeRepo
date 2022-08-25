@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>标签显示模式转换</title>
+    <style>
+        /*常见的块元素有<h1>~<h6>、<p>、<div>、<ul>、<ol>、<li>等，其中<div>标签是最典型的块元素。*/
+        /*块级元素的特点：*/
+        /*（1）总是从新行开始*/
+        /*（2）高度，行高、外边距以及内边距都可以控制。*/
+        /*（3）宽度默认是容器的100%*/
+        /*（4）可以容纳内联元素和其他块元素。*/
+        /*只有 文字才 能组成段落  因此 p  里面不能放块级元素，同理还有这些标签h1,h2,h3,h4,h5,h6,dt，他们都是文字类块级标签，里面不能放其他块级元素。*/
+        div{
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+            padding: 10px;
+            background-color: blue;
+        }
+        /*常见的行内元素有<a>、<strong>、<b>、<em>、<i>、<del>、<s>、<ins>、<u>、<span>等，其中<span>标签最典型的行内元素。*/
+        /*行内元素的特点：*/
+        /*（1）和相邻行内元素在一行上。*/
+        /*（2）高、宽无效，但水平方向的padding和margin可以设置，垂直方向的无效。*/
+        /*（3）默认宽度就是它本身内容的宽度。*/
+        /*（4）行内元素只能容纳文本或则其他行内元素。（a特殊）*/
+        /*链接里面不能再放链接。*/
+        span{
+            width: 100px;
+            height: 100px;
+            /*margin: 10px;*/
+            /*padding: 10px;*/
+            margin: 0px;
+            padding: 0px;
+            background-color: red;
+        }
+        /*在行内元素中有几个特殊的标签——<img />、<input />、<td>，可以对它们设置宽高和对齐属性，有些资料可能会称它们为行内块元素。*/
+        /*行内块元素的特点：*/
+        /*（1）和相邻行内元素（行内块）在一行上,但是之间会有空白缝隙。*/
+        /*（2）默认宽度就是它本身内容的宽度。*/
+        /*（3）高度，行高、外边距以及内边距都可以控制。*/
+        input{
+            background-color: red;
+            width: 100px;
+            height: 100px;
+            margin: 0px;
+            padding: 0px;
+            border: 0px;
+        }
+    </style>
+</head>
+<body>
+    <div>123</div>
+    <div>123</div>
+    <div>123</div>
+    <span>456</span>
+    <span>456</span>
+    <span>456</span><br/>
+    <span>456</span><br/>
+    <input type="text" value="text"><input type="text" value="text"><input type="text" value="text">
+</body>
+</html>

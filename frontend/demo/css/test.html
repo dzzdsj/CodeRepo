@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .item1  li{
+            color: #f00;
+        }
+        .item1 > li{
+            color: #0f0;
+        }
+        /*.item1  li {*/
+        /*    color: red;*/
+        /*}*/
+        ul li > a {  /*子代选择器 子 指的是 亲儿子  大于号分割   此时的a 一定是 li 的亲 儿子  */
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<ul class="item1">
+    <li>一级菜单
+        <ul class="item2">
+            <a href="#">aljl</a>
+            <li>二级菜单</li>
+            <li>二级菜单</li>
+            <li>二级菜单</li>
+        </ul>
+    </li>
+    <li>一级菜单
+        <ul class="item3">
+            <li>二级菜单</li>
+            <li>二级菜单</li>
+            <li>二级菜单</li>
+        </ul>
+    </li>
+</ul>
+<ul>
+    <li>
+        <a href="#">一级菜单</a>
+        <div>
+            <a href="#">二级菜单</a>
+            <a href="#">二级菜单</a>
+            <a href="#">二级菜单</a>
+        </div>
+    </li>
+</ul>
+</body>
+</html>

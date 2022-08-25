@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>index</title>
+    <style>
+        /*标签选择器:快速为页面中同类型的标签统一样式*/
+        p{
+            color: red;
+            size: 16px;
+        }
+        /*类选择器最大的优势是可以为元素对象定义单独或相同的样式*/
+        .myclass{
+            color: blue;
+            size: 16px;
+        }
+        /*多类名选择器，可以给标签指定多个类名，从而达到更多的选择目的*/
+        .myclass1{
+            color: pink;
+        }
+        .myclass2{
+            size: 20px;
+        }
+        /*id选择器使用“#”进行标识，后面紧跟id名*/
+        #myid{
+            color: red;
+        }
+        /*通配符选择器用“*”号表示，能匹配页面中所有的元素*/
+        /** {*/
+        /*    margin: 0;                    !* 定义外边距*!*/
+        /*    padding: 0;                   !* 定义内边距*!*/
+        /*}*/
+        /*伪类选择器用于向某些选择器添加特殊的效果。比如给链接添加特殊效果， 比如可以选择 第1个，第n个元素。*/
+        /*链接伪类选择器*/
+        a:link{
+            color: black;/* 未访问的链接 */
+        }
+        a:visited{
+            color: red;/*  已访问的链接 */
+        }
+        a:hover{
+            color: purple;/* 鼠标移动到链接上 */
+        }
+        a:active{
+            color: pink;/* 选定的链接 */
+        }
+        /*结构(位置)伪类选择器*/
+        /*:first-child :选取属于其父元素的首个子元素的指定选择器*/
+        /*:last-child :选取属于其父元素的最后一个子元素的指定选择器*/
+        /*:nth-child(n) ： 匹配属于其父元素的第 N 个子元素，不论元素的类型 */
+        /*:nth-last-child(n) ：选择器匹配属于其元素的第 N 个子元素的每个元素，不论元素的类型，从最后一个子元素开始计数。*/
+        /*  n 可以是数字、关键词或公式*/
+        /*:target目标伪类选择器 :选择器可用于选取当前活动的目标元素*/
+        :target {
+            color: purple;
+            font-size: 30px;
+        }
+        /*复合选择器是由两个或多个基础选择器，通过不同的方式组合而成的,目的是为了可以选择更准确更精细的目标元素标签*/
+        /*交集选择器由两个选择器构成，其中第一个为标签选择器，第二个为class选择器，两个选择器之间不能有空格，如h3.special。用的相对来说比较少，不太建议使用*/
+        h3.special{
+            background-color: red;
+        }
+        /*并集选择器（CSS选择器分组）是各个选择器通过逗号连接而成的，任何形式的选择器（包括标签选择器、class类选择器id选择器等），都可以作为并集选择器的一部分。如果某些选择器定义的样式完全相同，或部分相同，就可以利用并集选择器为它们定义相同的CSS样式。*/
+        h1,.myclass2,#myid{
+            color: blue;
+        }
+        /*后代选择器又称为包含选择器，用来选择元素或元素组的后代，其写法就是把外层标签写在前面，内层标签写在后面，中间用空格分隔。当标签发生嵌套时，内层标签就成为外层标签的后代*/
+        .nav ul li{
+            color: red;
+        }
+
+        .item1 li{
+            color: red;
+        }
+        /*子元素选择器只能选择作为某元素子元素的元素*/
+        .item1 > li {
+             color: blue;
+         }
+        /*属性选择器*/
+        /* E[attr]******存在attr属性即可*/
+        /* E[attr=val]******属性值完全等于val*/
+        /* E[attr\*=val]******属性值里包含val字符并且在“任意”位置*/
+        /* E[attr^=val]******属性值里包含val字符并且在“开始”位置*/
+        /* E[attr$=val]******属性值里包含val字符并且在“结束”位置*/
+        /* 获取到 拥有 该属性的元素 */
+        li[type] {
+            border: 1px solid gray;
+        }
+        /* 获取 属性等于某个值的 元素 属性值 可以使用 引号进行包裹 */
+        li[type="vegetable"] {
+            background-color: green;
+        }
+        /* 使用空格分隔的 多个属性 其中有某个属性即可获取 */
+        li[type~="hot"] {
+            font-size: 40px;
+        }
+        /* 获取以某个属性开头的语法  */
+        li[color^='green'] {
+            background-color: orange;
+        }
+        /* 获取以某个值 结尾的属性 */
+        li[type$='t']{
+            color: hotpink;
+            font-weight: 900;
+        }
+
+        /* 获取 属性中 拥有某个值的 元素 */
+        li[type*=ea] {
+            font-size: 100px;
+        }
+        /*  如果属性的值 只有very 也能够获取  用来获取 多个属性 并且 使用-连接 */
+        li[price|='very'] {
+            background-color: darkred;
+        }
+        /*伪元素选择器*/
+        /*1. E::first-letter文本的第一个单词或字（如中文、日文、韩文等）*/
+        /*2. E::first-line 文本第一行；*/
+        /*3. E::selection 可改变选中文本的样式；*/
+        /*4、E::before和E::after(E:after、E:before 在旧版本里是伪元素，CSS3的规范里“:”用来表示伪类，“::”用来表示伪元素，*/
+        /*但是在高版本浏览器下E:after、E:before会被自动识别为E::after、E::before，这样做的目的是用来做兼容处理。)*/
+        /* 在E元素  内部  的开始位置和结束位创建一个元素，该元素为行内元素，且必须要结合content属性使用。*/
+        p::first-letter {
+            font-size: 20px;
+            color: hotpink;
+        }
+
+        /* 首行特殊样式 */
+        p::first-line {
+            color: skyblue;
+        }
+
+        p::selection {
+            /* font-size: 50px; */
+            color: orange;
+        }
+        /*div::before {*/
+        /*    content:"开始";*/
+        /*}*/
+        /*div::after {*/
+        /*    content:"结束";*/
+        /*}*/
+    </style>
+</head>
+<body>
+<p>标签选择器是指用HTML标签名称作为选择器，按标签名称分类，为页面中某一类标签指定统一的CSS样式。</p>
+<h2>标签选择器是指用HTML标签名称作为选择器，按标签名称分类，为页面中某一类标签指定统一的CSS样式。</h2>
+<div class="myclass">class1</div>
+<div>class2</div>
+<!--多类名选择器-->
+<div class="myclass1 myclass2">可以给标签指定多个类名，从而达到更多的选择目的</div>
+<div id="myid">id选择器使用“#”进行标识，后面紧跟id名,元素的id值是唯一的</div>
+<div ><a href="#test1">跳转</a></div>
+<div id="test1">目标选择器测试</div>
+<div class="nav">
+    <ul>
+        <li>123</li>
+        <li>234</li>
+        <li>345</li>
+    </ul>
+</div>
+<div>
+    <ul>
+        <li>123</li>
+        <li>234</li>
+        <li>345</li>
+    </ul>
+</div>
+<ul class="item1">
+    <li>一级菜单
+        <ul>
+            <li>二级菜单</li>
+            <li>二级菜单</li>
+            <li>二级菜单</li>
+        </ul>
+    </li>
+    <li>一级菜单
+        <ul>
+            <li>二级菜单</li>
+            <li>二级菜单</li>
+            <li>二级菜单</li>
+        </ul>
+    </li>
+</ul>
+<ul>
+    <li type='fruit' color='green'>西瓜</li>
+    <li type='vegetable' color='greenyellow'>西兰花</li>
+    <li type='meat'>牛肉</li>
+    <li type='meat hot'>猪肉</li>
+    <li type='drink hot'>可乐</li>
+    <li type='drink hot'>雪碧</li>
+    <li price='very-cheap'>红酒</li>
+    <li price='very'>白酒</li>
+</ul>
+            <p>ljkllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllafks<br/>
+sfjklllllllllllllllllllllllllllllllllllllllllllll</p>
+</body>
+</html>
