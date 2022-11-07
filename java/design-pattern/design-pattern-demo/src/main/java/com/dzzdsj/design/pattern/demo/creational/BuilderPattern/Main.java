@@ -1,6 +1,6 @@
 package com.dzzdsj.design.pattern.demo.creational.BuilderPattern;
 
-import com.dzzdsj.design.pattern.demo.creational.BuilderPattern.ConcreteBuilder.TextBuilder;
+import com.dzzdsj.design.pattern.demo.creational.BuilderPattern.ConcreteBuilder.ConcreteBuilder;
 import com.dzzdsj.design.pattern.demo.creational.BuilderPattern.Director.Director;
 
 /**
@@ -8,11 +8,9 @@ import com.dzzdsj.design.pattern.demo.creational.BuilderPattern.Director.Directo
  */
 public class Main {
     public static void main(String[] args) {
-        TextBuilder textBuilder = new TextBuilder();
-        Director director = new Director(textBuilder);
-        director.constrcut();
-        String result = textBuilder.getResult();
-        System.out.println(result);
-        //todo htmlbuilder
+        ConcreteBuilder concreteBuilder = new ConcreteBuilder();
+        Director director = new Director(concreteBuilder);
+        director.constrcutProductA();
+        concreteBuilder.getResult();
     }
 }

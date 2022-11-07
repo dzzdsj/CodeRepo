@@ -4,8 +4,6 @@ import com.dzzdsj.design.pattern.demo.creational.BuilderPattern.Builder.Builder;
 
 /**
  * 构造一个使用Builder接口的对象
- * 利用建造者类（实际传入它的子类）编写文档
- *
  */
 public class Director {
     private Builder builder;
@@ -15,15 +13,15 @@ public class Director {
     }
 
     /**
-     * 构建文档的方法
+     * 使用Builder对象的接口构建产品
      */
-    public void constrcut() {
-        builder.makeTitle("早上好");
-        builder.makeString("从早上到下午");
-        builder.makeItems(new String[]{
-                "早上好",
-                "下午好"
-        });
-        builder.close();
+    public void constrcutProductA() {
+        builder.buildPartA();
+        builder.buildPartB();
+    }
+
+    public void constrcutProductB() {
+        builder.buildPartB();
+        builder.buildPartA();
     }
 }

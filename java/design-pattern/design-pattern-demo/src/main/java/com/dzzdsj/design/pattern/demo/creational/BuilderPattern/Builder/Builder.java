@@ -1,11 +1,10 @@
 package com.dzzdsj.design.pattern.demo.creational.BuilderPattern.Builder;
 
+/**
+ * 为创建一个Product对象的各个部件指定抽象接口
+ */
 public abstract class Builder {
-    public abstract void makeTitle(String title);
+    public abstract Builder buildPartA();
 
-    public abstract void makeString(String string);
-
-    public abstract void makeItems(String[] items);
-
-    public abstract void close();
+    public abstract Builder buildPartB();
 }
