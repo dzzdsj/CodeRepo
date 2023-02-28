@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    name: druid-test
+    url: jdbc:oracle:thin:@dev:1521:dzzdsjdb
+    username: dzzdsj
+    password: dzzdsj
+    driver-class-name: oracle.jdbc.OracleDriver
+    type: com.alibaba.druid.pool.DruidDataSource
+
+

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+<!-- Console       输出到控制台-->
+        <Console name="spring6log" target="SYSTEM_OUT">
+<!--            日志格式-->
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{1024} - %msg%n"/>
+        </Console>
+<!-- File       输出到文件-->
+<!--        append=false 不追加,每次重启清空-->
+        <File name="log" fileName="d:/tmp/test.log" append="false">
+            <PatternLayout>
+                <pattern>%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %m%n</pattern>
+            </PatternLayout>
+        </File>
+<!--RollingFile    滚动日志,超过指定大小自动备份压缩-->
+        <RollingFile name="RollingFile" fileName="d:/tmp/app.log"
+                     filePattern="log/$${date:yyyy-MM}/app-$d{MM-dd-yyyy}.%i.log.gz">
+            <PatternLayout>
+                <pattern>%d{yyyy-MM-dd 'at' HH:mm:ss z} %-5level %class{36}  %L %M - %msg%xEx%n</pattern>
+            </PatternLayout>
+            <SizeBasedTriggeringPolicy size="50MB" />
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+    </Appenders>
+
+
+    <Loggers>
+        <!--        日志级别 TRACE<DEBUG<INFO<WARN<ERROR<FATAL-->
+        <Root level="DEBUG">
+            <AppenderRef ref="spring6log"/>
+            <AppenderRef ref="RollingFile"/>
+            <AppenderRef ref="log"/>
+        </Root>
+    </Loggers>
+</Configuration>

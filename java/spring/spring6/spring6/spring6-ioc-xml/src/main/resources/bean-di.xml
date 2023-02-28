@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<!--    setter方法注入，调用的是无参构造函数-->
+    <bean id="book" class="com.dzzdsj.spring6.iocxml.inject.Book">
+        <property name="bname" value="前端开发"></property>
+        <property name="author" value="dzzdsj"></property>
+    </bean>
+<!--    构造器注入，调用的是有参构造函数-->
+    <bean id="bookCon" class="com.dzzdsj.spring6.iocxml.inject.Book">
+        <constructor-arg name="bname" value="ha"></constructor-arg>
+        <constructor-arg name="author" value="ha"></constructor-arg>
+    </bean>
+</beans>
