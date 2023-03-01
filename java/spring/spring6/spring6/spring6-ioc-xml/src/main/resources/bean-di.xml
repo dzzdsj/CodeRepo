@@ -12,4 +12,44 @@
         <constructor-arg name="bname" value="ha"></constructor-arg>
         <constructor-arg name="author" value="ha"></constructor-arg>
     </bean>
+<!--    注入对象-->
+<!--    注入对象方式一：引入外部bean-->
+    <bean id="emp1" class="com.dzzdsj.spring6.iocxml.inject.Emp">
+        <property name="ename" value="aa"></property>
+        <property name="age" value="1"></property>
+        <property name="dept" ref="dept"></property>
+    </bean>
+<!--    注入对象方式二：内部bean-->
+    <bean id="emp2" class="com.dzzdsj.spring6.iocxml.inject.Emp">
+        <property name="ename" value="bb"></property>
+        <property name="age" value="2"></property>
+        <property name="dept" >
+            <bean id="dept" class="com.dzzdsj.spring6.iocxml.inject.Dept">
+                <property name="dname" value="c"></property>
+            </bean>
+        </property>
+    </bean>
+<!--    注入对象方式三：级联属性赋值-->
+    <bean id="emp3" class="com.dzzdsj.spring6.iocxml.inject.Emp">
+        <property name="ename" value="cc"></property>
+        <property name="age" value="3"></property>
+        <property name="dept" ref="dept"></property>
+        <property name="dept.dname" value="php"></property>
+    </bean>
+    <bean id="dept" class="com.dzzdsj.spring6.iocxml.inject.Dept">
+        <property name="dname" value="java"></property>
+    </bean>
+<!--    数组对象赋值-->
+    <bean id="emp4" class="com.dzzdsj.spring6.iocxml.inject.Emp">
+        <property name="ename" value="cc"></property>
+        <property name="age" value="3"></property>
+        <property name="dept" ref="dept"></property>
+        <property name="hobbies">
+            <array>
+                <value>1</value>
+                <value>2</value>
+                <value>a</value>
+            </array>
+        </property>
+    </bean>
 </beans>
