@@ -1,61 +1,41 @@
 package com.dzzdsj.demo.algorithmsdemo.sort;
 
-import com.dzzdsj.demo.algorithmsdemo.common.DataFactory;
+import com.dzzdsj.demo.algorithmsdemo.common.IntegerGenerator;
 import com.dzzdsj.demo.algorithmsdemo.common.SortTamplate;
 
 /**
  * 插入排序
+ * 基本原理：从第array[1]开始，将元素插入到它之前元素的合适位置
+ *          外层循环i轮后，则前i个元素已经有序了。
+ *
  */
-public class InsertSort extends DataFactory implements SortTamplate {
+public class InsertSort implements SortTamplate {
 
-    public  void sort(Comparable[] array) {
+    public void sort(Comparable[] array) {
         for (int i = 1; i < array.length; i++) {
-            System.out.println("round " + i);
-            for (int j = i ; j > 0 && less(array[j], array[j-1]); j--) {
+            System.out.println("outer loop " + "i=" + i);
+            for (int j = i; j > 0 && less(array[j], array[j - 1]); j--) {
+                System.out.println("    inner loop " + "i=" + i + ",j=" + j);
                 //将第i个元素里插入到它之前的元素中（i之前的都有序了）
                 //为了给待插入的元素腾地方，这里的做法是从第i个元素开始，依次与它的前一个元素做比较，发现比它小就交换位置
                 //直到到达它的合适的位置
-                exchange(array, j, j-1);
+                exchange(array, j, j - 1);
                 show(array);
             }
-            show(array);
         }
     }
 
-    public  boolean less(Comparable v, Comparable w) {
-        return v.compareTo(w) < 0;
-    }
-
-    public  void exchange(Comparable[] array, int i, int j) {
-        Comparable temp = array[i];
-        array[i] = array[j];
-        array[j] = temp;
-    }
-
-    public  void show(Comparable[] array) {
-        for (int i = 0; i < array.length; i++) {
-            System.out.print(array[i] + " ");
-        }
-        System.out.println();
-    }
-
-    public  boolean isSorted(Comparable[] array) {
-        for (int i = 0; i < array.length; i++) {
-            if (less(array[i], array[i - 1])) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     public static void main(String[] args) {
-        InsertSort data = new InsertSort();
-//        data.genData(Integer.valueOf(args[0]));
-        data.genData(10);
+        IntegerGenerator integerGenerator = new IntegerGenerator();
+        Comparable[] comparables = integerGenerator.generateData(8);
+        InsertSort InsertSort = new InsertSort();
         System.out.println("======== before sort ======== ");
-        data.show(data.getData());
+        InsertSort.show(comparables);
         System.out.println("======== start sort ======== ");
-        data.sort(data.getData());
+        InsertSort.sort(comparables);
+        System.out.println("======== after sort ======== ");
+        InsertSort.show(comparables);
     }
 }
 /*

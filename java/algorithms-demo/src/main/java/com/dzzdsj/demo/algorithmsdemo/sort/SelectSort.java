@@ -1,20 +1,24 @@
 package com.dzzdsj.demo.algorithmsdemo.sort;
 
-import com.dzzdsj.demo.algorithmsdemo.common.DataFactory;
+import com.dzzdsj.demo.algorithmsdemo.common.IntegerGenerator;
 import com.dzzdsj.demo.algorithmsdemo.common.SortTamplate;
 
 /**
  * 选择排序
+ * 基本思想：从所有 n个元素中找到最小的一个元素，放到第1个位置(位置交换)
+ * 从剩下的 n-1个元素中找到最小的一个元素，放到第2个位置(位置交换)
+ * 。。。
  */
-public class SelectSort extends DataFactory implements SortTamplate {
-
-    public  void sort(Comparable[] array) {
+public class SelectSort implements SortTamplate {
+    @Override
+    public void sort(Comparable[] array) {
         for (int i = 0; i < array.length; i++) {
-            System.out.println("round " + i);
+            System.out.println("outer loop " + "i=" + i);
             //最小元素的索引,每一轮先假定第i个元素为最小
             int minIndex = i;
             for (int j = i + 1; j < array.length; j++) {
-                if (less(array[j], array[minIndex])){
+//                System.out.println("    inner loop " + "i=" + i + ",j=" + j);
+                if (less(array[j], array[minIndex])) {
                     minIndex = j;
                 }
             }
@@ -24,40 +28,16 @@ public class SelectSort extends DataFactory implements SortTamplate {
         }
     }
 
-    public  boolean less(Comparable v, Comparable w) {
-        return v.compareTo(w) < 0;
-    }
-
-    public  void exchange(Comparable[] array, int i, int j) {
-        Comparable temp = array[i];
-        array[i] = array[j];
-        array[j] = temp;
-    }
-
-    public  void show(Comparable[] array) {
-        for (int i = 0; i < array.length; i++) {
-            System.out.print(array[i] + " ");
-        }
-        System.out.println();
-    }
-
-    public  boolean isSorted(Comparable[] array) {
-        for (int i = 0; i < array.length; i++) {
-            if (less(array[i], array[i - 1])) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public static void main(String[] args) {
-        SelectSort data = new SelectSort();
-//        data.genData(Integer.valueOf(args[0]));
-        data.genData(8);
+        IntegerGenerator integerGenerator = new IntegerGenerator();
+        Comparable[] comparables = integerGenerator.generateData(8);
+        SelectSort selectSort = new SelectSort();
         System.out.println("======== before sort ======== ");
-        data.show(data.getData());
+        selectSort.show(comparables);
         System.out.println("======== start sort ======== ");
-        data.sort(data.getData());
+        selectSort.sort(comparables);
+        System.out.println("======== after sort ======== ");
+        selectSort.show(comparables);
     }
 }
 /*
