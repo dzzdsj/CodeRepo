@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+<!--    The full path name of a JAR/ZIP file to add to the classpath, or a directory to add to the classpath-->
+    <classPathEntry location="D:\m2\repository\com\oracle\ojdbc\ojdbc8\19.3.0.0\ojdbc8-19.3.0.0.jar" />
+
+    <context id="OracleTables" targetRuntime="MyBatis3">
+        <commentGenerator>
+            <property name="suppressDate" value="true"/>
+            <property name="suppressAllComments" value="true"/>
+        </commentGenerator>
+        <jdbcConnection driverClass="oracle.jdbc.driver.OracleDriver"
+                        connectionURL="jdbc:oracle:thin:@dev:1521:dzzdsjdb"
+                        userId="dzzdsj"
+                        password="dzzdsj">
+        </jdbcConnection>
+
+        <javaTypeResolver >
+            <property name="forceBigDecimals" value="false" />
+        </javaTypeResolver>
+<!--model-->
+        <javaModelGenerator targetPackage="com.dzzdsj.code.databasedemo.entity" targetProject="src/main/java">
+            <property name="enableSubPackages" value="true" />
+            <property name="trimStrings" value="true" />
+        </javaModelGenerator>
+<!--xml-->
+        <sqlMapGenerator targetPackage="mybatis.mapper"  targetProject="src/main/resources">
+            <property name="enableSubPackages" value="true" />
+        </sqlMapGenerator>
+<!--mapper-->
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.dzzdsj.code.databasedemo.mapper"  targetProject="src/main/java">
+            <property name="enableSubPackages" value="true" />
+        </javaClientGenerator>
+
+        <table schema="dzzdsj" tableName="t_test" domainObjectName="Test" >
+<!--            <property name="useActualColumnNames" value="true"/>-->
+<!--            <generatedKey column="ID" sqlStatement="DB2" identity="true" />-->
+<!--            change certain attributes of an introspected database column from the values that would be calculated by default-->
+<!--            <columnOverride column="DATE_FIELD" property="startDate" />-->
+<!--            <ignoreColumn column="FRED" />-->
+<!--            <columnOverride column="LONG_VARCHAR_FIELD" jdbcType="VARCHAR" />-->
+        </table>
+
+    </context>
+</generatorConfiguration>
