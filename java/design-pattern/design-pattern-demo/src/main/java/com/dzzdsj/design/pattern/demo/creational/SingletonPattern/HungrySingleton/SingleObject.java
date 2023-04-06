@@ -17,14 +17,16 @@ package com.dzzdsj.design.pattern.demo.creational.SingletonPattern.HungrySinglet
  *
  */
 public class SingleObject {
-    //创建 SingleObject 的一个对象
+    //要点1：在类加载时就 创建 SingleObject 的一个对象
+    //static修饰，在类加载时初始化
     private static SingleObject instance = new SingleObject();
 
-    //让构造函数为 private，这样该类就不会被实例化
+    //要点2：让构造函数为 private，这样该类就不会被实例化（使用构造函数方式）
     private SingleObject() {
     }
 
-    //获取唯一可用的对象
+    //要点3：另外提供一个获取实例的方法，获取唯一可用的对象
+    //由于无法通过构造函数实例化对象了，所以获取实例的方法需要是static的
     public static SingleObject getInstance() {
         return instance;
     }

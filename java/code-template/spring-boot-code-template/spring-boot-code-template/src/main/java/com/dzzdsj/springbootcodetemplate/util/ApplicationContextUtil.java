@@ -5,6 +5,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+/**
+ * 应用上下文工具类
+ */
 @Component
 public class ApplicationContextUtil implements ApplicationContextAware {
     private static ApplicationContext applicationContext;

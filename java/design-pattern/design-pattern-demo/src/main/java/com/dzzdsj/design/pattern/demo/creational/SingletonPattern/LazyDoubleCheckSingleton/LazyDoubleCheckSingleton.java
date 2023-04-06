@@ -2,6 +2,14 @@ package com.dzzdsj.design.pattern.demo.creational.SingletonPattern.LazyDoubleChe
 
 /**
  * 双重检测懒汉式单例
+ * 是否 Lazy 初始化：是
+ *
+ * 是否多线程安全：是
+ *
+ * 实现难度：较复杂
+ *
+ * 描述：这种方式采用双锁机制，安全且在多线程情况下能保持高性能。
+ * getInstance() 的性能对应用程序很关键。
  */
 public class LazyDoubleCheckSingleton {
     private volatile static LazyDoubleCheckSingleton instance;
@@ -16,7 +24,7 @@ public class LazyDoubleCheckSingleton {
         /**
          * 进一步改进版，只针new的过程加锁,且对判断null的过程加同步
          */
-
+        //大部分情况下，不会进入加锁的代码块，同时保证第一次获取实例时是线程安全
         if (instance == null) {
             synchronized (LazyDoubleCheckSingleton.class) {
                 //双重判断
@@ -51,7 +59,7 @@ public class LazyDoubleCheckSingleton {
      */
 //    public static LazyDoubleCheckSingleton getInstance() {
 //        /**
-//         * 改进版，只针对实例化的过程加锁,
+//         * 改进版，缩小加锁的代码块，只针对实例化的过程加锁
 //         */
 //        synchronized (LazyDoubleCheckSingleton.class) {
 //            if (instance == null) {
