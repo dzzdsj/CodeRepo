@@ -8,6 +8,9 @@ import com.dzzdsj.demo.algorithmsdemo.common.SortTamplate;
  * 基本原理：从第array[1]开始，将元素插入到它之前元素的合适位置
  *          外层循环i轮后，则前i个元素已经有序了。
  *
+ * 特点：（shell排序将数组分组拆小，才能发挥插入排序的优势）
+ * 1. 当待排序的原序列中大多数元素都已有序的情况下，此时进行的元素比较和移动的次数较少；
+ * 2. 当原序列的长度很小时，即便它的所有元素都是无序的，此时进行的元素比较和移动的次数还是很少。
  */
 public class InsertSort implements SortTamplate {
 

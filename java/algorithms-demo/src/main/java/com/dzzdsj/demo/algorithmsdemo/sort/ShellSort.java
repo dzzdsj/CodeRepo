@@ -4,9 +4,9 @@ import com.dzzdsj.demo.algorithmsdemo.common.IntegerGenerator;
 import com.dzzdsj.demo.algorithmsdemo.common.SortTamplate;
 
 /**
- * 插入排序
- * 基本原理：从第array[1]开始，将元素插入到它之前元素的合适位置
- * 外层循环i轮后，则前i个元素已经有序了。
+ * 希尔排序
+ * 基本原理：是插入排序的改进，将待排序数组拆分为h（增量）组，再对h组数据进行插入排序。再减小h，进行多轮
+ *          好处是减少了每次插入排序的数组大小，同时多次操作后，数组整体已经基本有序了
  */
 public class ShellSort implements SortTamplate {
 
@@ -16,10 +16,14 @@ public class ShellSort implements SortTamplate {
         while (h < size / 3) {
             h = 3 * h + 1;
         }
+//        外层循环，控制排序的趟数
         while (h >= 1) {
             System.out.println("outer loop h=" + h);
+//            整个数组分为h个子序列。其中第0~h-1个元素分属于不同的子序列。
+//            中间层循环，顺序遍历整个数组每个元素，每遍历到一个元素，就对在它所属的子序列对它进行插入排序
             for (int i = h; i < size; i++) {
                 System.out.println("    middle loop " + "i=" + i + ",h=" + h);
+//                内层循环，进行插入排序
                 for (int j = i; j >= h && less(array[j], array[j - h]); j -= h) {
                     System.out.println("        inner loop " + "i=" + i + ",h=" + h + ",j=" + j);
                     exchange(array, j, j - h);
