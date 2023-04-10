@@ -9,11 +9,11 @@ import java.util.List;
 //创建命令调用类。
 public class Broker {
     private List<Order> orderList = new ArrayList<Order>();
-
+//添加命令
     public void takeOrder(Order order) {
         orderList.add(order);
     }
-
+    //执行所有命令
     public void placeOrders() {
         for (Order order : orderList) {
             order.execute();
