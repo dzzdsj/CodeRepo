@@ -1,8 +1,17 @@
 package com.dzzdsj.design.pattern.demo.behavioral.MediatorPattern;
 
+import com.dzzdsj.design.pattern.demo.behavioral.MediatorPattern.Mediatee.User;
+
 /**
  * 中介者模式（Mediator Pattern）是用来降低多个对象和类之间的通信复杂性。
  * 这种模式提供了一个中介类，该类通常处理不同类之间的通信
  */
 public class MediatorPatternDemo {
+    public static void main(String[] args) {
+        User robert = new User("Robert");
+        User john = new User("John");
+
+        robert.showMessage("hello");
+        john.showMessage("hello2");
+    }
 }

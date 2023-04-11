@@ -7,6 +7,7 @@ import com.dzzdsj.design.pattern.demo.behavioral.IteratorPattern.Iterator.Iterat
 /**
  * 使用iterator模式的作用是：将遍历和实现分开来。 针对同一个集合，可以定义多个iterator的实现类
  * 就算更改了集合的具体实现，这里的调用代码也不需要作修改
+ * 提供一种遍历集合的方法，而不需要暴露内部表示
  */
 public class Main {
     public static void main(String[] args) {
