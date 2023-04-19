@@ -38,10 +38,27 @@
         <!-- v-for -->
         <ul v-for="msg in items">
             <li>
-               <P>{{_data.items.msg}}11</P>
+               <P>{{msg}}11</P>
             </li>
         </ul>
 
+        <!--作用同插值表达式 {{}}  -->
+        <p v-text="message"></p>
+
+        <!-- v-html 更新元素的innerHTML-->
+
+        <!-- v-bind 或者 简写为： 响应更新html特性 -->
+
+        <!-- v-on 绑定事件监听器 -->
+
+        <!-- v-ref -->
+
+        <!-- v-el -->
+
+        <!-- v-pre -->
+
+        <!-- v-cloak  配合css实现隐藏未完成渲染的元素-->
+        <p v-cloak>{{message}}</p>
     </div>
 
 <!-- v-if的切换：真实的条件渲染、局部渲染、惰性渲染 -->
@@ -75,7 +92,9 @@
 		// console.log(vm._data.message); 
 		// console.log(vm.message);  
     </script>
-
+        <style>
+            [v-cloak]{display: none}
+        </style>
 </body>
 
 </html>
