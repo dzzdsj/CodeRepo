@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./lib/vue-2.4.0.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <!-- v-if 在DOM中生成或移除一个元素 -->
+        <p v-if="showMessage">{{ message }}</p>
+        <!-- v-else 需要紧跟v-if,v-show配合使用 -->
+        <p v-else="showMessage">else {{ message }} else</p>
+        <!-- 可以使用template 标签包裹多个元素 -->
+        <template v-if="showMessage">
+            <p>{{ message }}</p>
+            <p>{{ message }}</p>
+            <p>{{ message }}</p>
+        </template>
+
+        <!--v-show 控制元素是否显示  -->
+        <p v-show="showMessage">{{ message }}</p>
+
+        <!-- v-model 用于表单控件元素的数据双向绑定 -->
+        <form>
+            <input type="text" v-model="message" placeholder="">
+            <select v-model="message">
+                <option value="1" selected>1</option>
+                <option value="2" selected>2</option>
+                <option value="3" >3</option>
+            </select>
+        </form>
+
+        <!-- v-for -->
+        <ul v-for="msg in items">
+            <li>
+               <P>{{_data.items.msg}}11</P>
+            </li>
+        </ul>
+
+    </div>
+
+<!-- v-if的切换：真实的条件渲染、局部渲染、惰性渲染 -->
+<!-- v-show 简单的基于css切换，元素还在   <p style="display: none;">hello</p>-->
+<!-- v-show 不支持 template语法 -->
+
+
+    <script>
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                message: 'hello',
+                showMessage: true,
+                // showMessage: false
+                items: [
+                    {msg: '1'},
+                    {msg: '2'},
+                    {msg: '3'}
+                ]
+            }
+        })
+
+
+        
+		// console.log(vm.$data) //{__ob__: Observer}
+		// console.log(vm._data); //{__ob__: Observer}
+		// console.log(vm.$data == vm._data); //true
+		
+		// //三种方式都可以访问到message
+		// console.log(vm.$data.message); 
+		// console.log(vm._data.message); 
+		// console.log(vm.message);  
+    </script>
+
+</body>
+
+</html>
