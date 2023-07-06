@@ -3,11 +3,13 @@ package com.dzzdsj.design.pattern.demo.structural.ProxyPattern;
 import com.dzzdsj.design.pattern.demo.structural.ProxyPattern.Proxy.ProxyImage;
 import com.dzzdsj.design.pattern.demo.structural.ProxyPattern.Subject.Image;
 
-/**
+/**2
  * 在代理模式（Proxy Pattern）中，一个类代表另一个类的功能,用于实现想在访问一个类时做一些控制。
  * 主要解决：在直接访问对象时带来的问题，比如说：要访问的对象在远程的机器上。在面向对象系统中，
  * 有些对象由于某些原因（比如对象创建开销很大，或者某些操作需要安全控制，或者需要进程外的访问），
  * 直接访问会给使用者或者系统结构带来很多麻烦，我们可以在访问此对象时加上一个对此对象的访问层。
+ *
+ * 代理模式和被代理者对外的接口是相同的，而适配器模式不是
  */
 public class ProxyPatternDemo {
     public static void main(String[] args) {
