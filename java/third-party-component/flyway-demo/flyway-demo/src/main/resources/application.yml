@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@dev:1521:dzzdsjdb
+    username: dzzdsj
+    password: dzzdsj
+  flyway:
+    enabled: true
+    clean-disabled: true
