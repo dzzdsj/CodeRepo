@@ -29,6 +29,90 @@ JavaBean实现之前只有EJB才能完成的事情。但Spring不仅仅局限于
 容器是Spring框架的核心。Spring容器使用DI管理构成应用的组件，
 它会创建相互协作的组件之间的关联
 
+
+
+## spring包结构
+
+aop
+
+该模块包含在应用程序中使用Spring的 AOP功能时所需的所有类.如果打算在Spring中使用其他使用了AOP的功能，例如声明式事务管理，则需要在应用程序中包含此JAR文件。此外，支持与AspeactJ集成的类也封装在此模块中
+
+aspects
+
+该模块包含与AspectJ AOP库进行高级集成的所有类。例如,如果为完成Spring配置而使用Java类，并且需要Aspectl风格的注解驱动的事务管理，则需要使用此模块
+
+beans
+
+该模块包含所有支持Spring对 Spring bean进行操作的类。该模块中的大多数类都支持 Spring的 bean 工厂实现。例如,处理 Spring XML配置文件和 Java注解所需的类被封装到此模块中
+
+beans-groovy
+
+此模块包含用于支持 Spring对 Spring bean进行操作的Groovy类
+
+context
+
+该模块包含为Spring Core提供许多扩展的类。你会发现所有类都需要使用 Spring的 ApplicationContext 功能(将在第5章介绍)以及Enterprise JavaBeans(EJB)、Java Naming and Directory
+
+context-indexer
+
+该模块包含一个索引器实现，它提供对 META-INF/spring.components 中定义的候选项的访问功能。但核心类CandidateComponentsIndex并不能在外部使用
+
+context-support
+
+该模块包含对spring-context 模块的进一步扩展。在用户界面方面，有一些用于支持邮件并与模板引擎(例如Velocity、FreeMarker和 JasperReports)集成的类。此外，还包括与各种任务执行和调度库(包括CommonJ和 Quartz)的集成这是每个Spring应用程序都需要的主要模块。在该JAR文件中，可以找到所有其他Spring模块(例如，用于访问配置文件的类)所共享的所有类。另外，在该JAR文件中，会发现在整个Spring 代码库中都使用的非常有用的实用程序类，可以在自己的应用程序中使用它们
+
+expression
+
+该模块包含Spring Expression Language(SpEL)的所有支持类
+
+instrument
+
+该模块包含用于JVM启动的Spring 工具代理。如果在Spring应用程序中使用Aspectl'实现加载时织入，那么该模块是必需的
+
+jdbc
+
+该模块包含所有的 JDBC支持类。对于需要数据库访问的所有应用程序，都需要此模块。支持数据源、JDBC 数据类型、JDBC模板、本地JDBC连接等的类都被打包在此模块中
+
+jms
+
+该模块包含JMS支持的所有类
+
+orm
+
+该模块扩展了Spring的标准JDBC功能集,支持流行的ORM.工具，包括Hibernate.JDO、JPA和数据映射器iBATIS.该JAR文件中的许多类都依赖于spring-jdbc JAR文件中所包含的类，因此也需要把它包含在应用程序中
+
+oxm
+
+该模块扩展了Spring的标准JDBC功能集,支持流行的ORM.工具，包括Hibermnate.JDO.JPA和数据映射器iBATIS.该JAR文件中的许多类都依赖于spring-jdbc JAR文件中所包含的类，因此也需要把它包含在应用程序中
+
+test
+
+Spring 提供一-组模拟类来帮助测试应用程序，并且许多模拟类都在Spring 测试套件中使用，所以它们都经过了很好的测试;从而使测试应用程序变得更简单。在对Web应用程序进行单元测试时会发现模拟HttpServletRequest和HttpServletResponse类所带来的好处。另一方面，Spring 提供了与JUnit单元测试框架的紧密集成，并且在该模块中提供了许多支持JUnit测试用例开发的类;例如，SpringJUnit4ClassRunner-提供了一种在单元测试环境中引导SpringApplicationContext的简单方法
+
+tx
+
+该模块提供支持Spring事务基础架构的所有类。可以从事务抽象层找到相应的类来支持Java Transaction API(JTA)以及与主要供应商的应用程序服务器的集成
+
+web
+
+此模块包含在Web应用程序中使用Spring所需的核心类，包括用于自动加载ApplicationContext功能的类、文件上传支持类以及一些用于执行重复任务(比如从查询字符串中解析整数值)的有用类
+
+web-reactive
+
+该模块包含Spring Web Reactive模型的核心接口和类
+
+web-mvc
+
+该模块包含Spring自己的MVC框架的所有类。如果想要为应用程序使用单独的MVC框架，则不需要此JAR文件中的任何类。Spring MVC在第16章中有更详细的介绍
+
+webfsocket
+
+该模块提供对JSR-356(WebSocket的 Java API)的支持
+
+
+
+
+
 ## bean的装配
 
 ### 装配机制
