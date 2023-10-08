@@ -23,7 +23,8 @@ public class ShellSort implements SortTamplate {
 //            中间层循环，顺序遍历整个数组每个元素，每遍历到一个元素，就对在它所属的子序列对它进行插入排序
             for (int i = h; i < size; i++) {
                 System.out.println("    middle loop " + "i=" + i + ",h=" + h);
-//                内层循环，进行插入排序
+//                内层循环，进行插入排序，这里是位置j和j-h比较,而不是j和j-1，只有这样才能使数组整体有序，
+//                比较的位置是h，2h，3h....nh
                 for (int j = i; j >= h && less(array[j], array[j - h]); j -= h) {
                     System.out.println("        inner loop " + "i=" + i + ",h=" + h + ",j=" + j);
                     exchange(array, j, j - h);

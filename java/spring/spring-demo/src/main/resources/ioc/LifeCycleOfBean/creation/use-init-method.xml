@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+       default-lazy-init="true"><!--    第一次获取bean实例时进行加载,有没有该配置，本例执行结果将不同-->
+<!--    default-init-method="init" 初始化方法一致时，可以简化-->
+
+    <bean id="singerOne" class="com.dzzdsj.demo.springdemo.ioc.LifeCycleOfBean.creation.UseXML"
+        init-method="init" p:name="John Mayer" p:age="39"/>
+    <bean id="singerTwo" class="com.dzzdsj.demo.springdemo.ioc.LifeCycleOfBean.creation.UseXML"
+          init-method="init"  p:age="72"/>
+    <bean id="singerThree" class="com.dzzdsj.demo.springdemo.ioc.LifeCycleOfBean.creation.UseXML"
+          init-method="init" p:name="John Butler" />
+</beans>
