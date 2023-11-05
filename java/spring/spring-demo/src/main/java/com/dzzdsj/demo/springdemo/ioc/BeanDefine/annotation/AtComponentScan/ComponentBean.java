@@ -1,4 +1,4 @@
-package com.dzzdsj.demo.springdemo.BeanDefine.annotation.AtComponentScan;
+package com.dzzdsj.demo.springdemo.ioc.BeanDefine.annotation.AtComponentScan;
 
 import lombok.Data;
 import org.springframework.context.annotation.Bean;

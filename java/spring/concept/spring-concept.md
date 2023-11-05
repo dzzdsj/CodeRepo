@@ -173,9 +173,11 @@ xml   <context:component-scan>
 
 
 
+## bean的生命周期
 
 
 
+![](./pictures/springbean生命周期.jpg)
 
 
 

@@ -1,6 +1,5 @@
-package com.dzzdsj.demo.springdemo.BeanDefine.annotation.AtComponentScan;
+package com.dzzdsj.demo.springdemo.ioc.BeanDefine.annotation.AtComponentScan;
 
-import com.dzzdsj.demo.springdemo.BeanDefine.annotation.AtBean.AnnotationBeanConfig;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;

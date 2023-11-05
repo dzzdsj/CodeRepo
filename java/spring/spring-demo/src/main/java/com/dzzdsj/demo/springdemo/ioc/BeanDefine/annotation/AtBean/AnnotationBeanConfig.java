@@ -1,4 +1,4 @@
-package com.dzzdsj.demo.springdemo.BeanDefine.annotation.AtBean;
+package com.dzzdsj.demo.springdemo.ioc.BeanDefine.annotation.AtBean;
 
 import lombok.Data;
 import org.springframework.context.annotation.Bean;
