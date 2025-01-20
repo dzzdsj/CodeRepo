@@ -1,0 +1,41 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  datasource:
+    username: dzzdsj
+    password: dzzdsj
+#    url: jdbc:mysql://localhost:3306/springboot-hibernate
+    url: jdbc:oracle:thin:@dev:1521:dzzdsjdb
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    type: com.alibaba.druid.pool.DruidDataSource
+  # 只返回不为null的数据
+  jackson:
+    default-property-inclusion: non_null
+  jpa:
+#    database: MYSQL
+    database: ORACLE
+    show-sql: true
+    hibernate:
+#      ddl-auto: update
+      ddl-auto: create-drop
+    properties:
+#      org:
+#        hibernate:
+#          envers:
+#            audit_table_suffix: _AUDIT
+#            revision_field_name: REVISION_ID
+#            revision_type_field_name: REVISION_TYPE
+      hibernate:
+        dialect: org.hibernate.dialect.Oracle12cDialect
+    #        dialect: org.hibernate.dialect.MySQL8Dialect
+#    database-platform: org.hibernate.dialect.MySQL8Dialect
+    database-platform: org.hibernate.dialect.Oracle12cDialect
+
+logging:
+  level:
+    springfox: error
+    com.example.hibernate: debug

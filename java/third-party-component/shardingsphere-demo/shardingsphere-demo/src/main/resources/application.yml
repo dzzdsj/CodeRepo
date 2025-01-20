@@ -1,0 +1,24 @@
+spring:
+  shardingsphere:
+    datasource:
+      names: opengauss_0
+      opengauss_0:
+      type: com.alibaba.druid.pool.DruidDataSourc
+      username: dzzdsj
+      password: Dzzdsj1991
+      url: jdbc:opengauss://dev:15400/postgres?currentSchema=dzzdsj
+      driver-class-name: org.opengauss.Driver
+
+  #  datasource:
+#    driver-class-name: org.opengauss.Driver
+#    url: jdbc:opengauss://dev:15400/postgres?currentSchema=dzzdsj
+#    type: com.alibaba.druid.pool.DruidDataSource
+#    username: dzzdsj
+#    password: Dzzdsj1991
+  jpa:
+    database: postgresql
+    show-sql: true
+    hibernate:
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyHbmImpl
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl

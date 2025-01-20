@@ -47,8 +47,8 @@
             maxElementsOnDisk="5"
             overflowToDisk="true"
             diskPersistent="true"
-            timeToIdleSeconds="50"
-            timeToLiveSeconds="50"
+            timeToIdleSeconds="600"
+            timeToLiveSeconds="600"
             memoryStoreEvictionPolicy="LRU"/>
 
 </ehcache>

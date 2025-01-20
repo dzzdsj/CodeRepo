@@ -3,16 +3,19 @@ package com.dzzdsj.tools.dbtools;
 
 
 import oracle.jdbc.OracleConnection;
+import org.opengauss.copy.CopyManager;
+import org.opengauss.core.BaseConnection;
 
+import java.io.StringReader;
 import java.sql.*;
 import java.util.Properties;
 
 /**
- * 演示建表、插入、更新等常规操作
+ *
  */
-public class DBTest {
+public class MigrationTest {
     //创建数据库连接。
-    public static Connection getConnection(String username, String passwd) {
+    public static Connection getOracleConnection() {
         String driver = "oracle.jdbc.driver.OracleDriver";
         String sourceURL = "jdbc:oracle:thin:@dev:1521:dzzdsjdb";
         Connection conn = null;
@@ -40,6 +43,53 @@ public class DBTest {
             boolean b = oracleConnection.isValid(0);
             System.out.println("b=" + b);
 //            conn = DriverManager.getConnection(sourceURL, username, passwd);
+            System.out.println("Connection succeed!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return conn;
+    }
+
+    public static Connection getOpenGaussConnection() {
+        String driver = "org.opengauss.Driver";
+        String sourceURL = "jdbc:opengauss://dev:15400/postgres";
+        Connection conn = null;
+        try {
+            Class.forName(driver).newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        try {
+//创建数据库连接。
+            //
+//            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+            Properties props = new Properties();
+//            props.put("oracle.net.encryption_client", "accepted");
+//            props.put("oracle.net.encryption_client", "rejected");
+//            props.put("oracle.net.encryption_types_client", "RC4_256");
+            props.put("user", "dzzdsj");
+            props.put("password", "Dzzdsj1991");
+            String delimiter = "|";
+            String encoding ="UTF8";
+            String tableName="dzzdsj.t_test";
+            StringBuffer buffer = new StringBuffer();
+//            buffer.append("1|test|hfdre     |2024-10-28 23:00:31|2024-10-28 23:00:31");
+            buffer.append("1|test|hfdre     |2024-10-28 23:00:31|2024-10-28 23:00:31\n" +
+                    "2|\\\\\\\\|vtxlz     |2024-10-28 23:00:31|2024-10-28 23:00:31\n" +
+                    "3|\\N|clohp     |2024-10-28 23:00:31|2024-10-28 23:00:31\n" +
+                    "4|XRUVA|cccvw     |2024-10-28 23:00:31|2024-10-28 23:00:31");
+            conn = DriverManager.getConnection(sourceURL, props);
+            BaseConnection baseConn = (BaseConnection) conn;
+            baseConn.setAutoCommit(false);
+            String sql = "Copy " + tableName + " from STDIN with (DELIMITER " + "'" + delimiter + "'" +"," + "ENCODING " + "'" + encoding + "')";
+            CopyManager cp = new CopyManager(baseConn);
+            StringReader reader = new StringReader(buffer.toString());
+            cp.copyIn(sql, reader);
+            baseConn.commit();
+            reader.close();
+            baseConn.close();
             System.out.println("Connection succeed!");
         } catch (Exception e) {
             e.printStackTrace();
@@ -176,7 +226,8 @@ public class DBTest {
 //创建数据库连接。
 //        Connection conn = getConnection("gsdb", "Dzzdsj1991");
         System.out.println(System.currentTimeMillis());
-        Connection conn = getConnection("dzzdsj", "dzzdsj");
+        Connection oracleConn = getOracleConnection();
+        Connection openGaussConn = getOpenGaussConnection();
 //创建表。
 //        createTable(conn);
 ////批插数据。
@@ -185,13 +236,14 @@ public class DBTest {
 //        execPreparedSQL(conn);
         //执行查询
         System.out.println(System.currentTimeMillis());
-        execSelectSQL(conn);
+        execSelectSQL(oracleConn);
         System.out.println(System.currentTimeMillis());
 ////执行存储过程。
 //        execCallableSQL(conn);
 //关闭数据库连接。
         try {
-            conn.close();
+            oracleConn.close();
+            openGaussConn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
