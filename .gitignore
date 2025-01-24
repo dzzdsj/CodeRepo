@@ -162,3 +162,8 @@ dmypy.json
 
 #macos
 .DS_Store
+
+#maven
+.mvn/
+mvnw
+mvnw.cmd
