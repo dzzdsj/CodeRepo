@@ -4,7 +4,7 @@ spring:
     password: Dzzdsj@1991
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/test_mybatis?useUnicode=true&character_set_server=utf8mb4
+    url: jdbc:mysql://dev:3306/dzzdsjdb?useUnicode=true&character_set_server=utf8mb4
 mybatis:
   mapper-locations: classpath:mybatis/mapper/*.xml
   type-aliases-package: com.dzzdsj.demo.mybatisdemo.entity

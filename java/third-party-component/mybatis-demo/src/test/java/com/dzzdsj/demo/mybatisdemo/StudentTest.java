@@ -30,7 +30,11 @@ public class StudentTest {
         System.out.println(result);
     }
 //
-//    Student selectByPrimaryKey(Long sid);
+    @Test
+    void selectByPrimaryKey(){
+        Student student = studentMapper.selectByPrimaryKey(1L);
+        System.out.println(student);
+    }
 //
 //    int updateByPrimaryKeySelective(Student record);
 //

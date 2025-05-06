@@ -2,6 +2,7 @@ package com.dzzdsj.demo.mybatisdemo.entity;
 
 import java.util.Date;
 
+//@MyAnnotation(value = "student")
 public class Student {
     private Long sid;
 
@@ -71,5 +72,18 @@ public class Student {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "sid=" + sid +
+                ", sname='" + sname + '\'' +
+                ", age=" + age +
+                ", cardNo='" + cardNo + '\'' +
+                ", mobile='" + mobile + '\'' +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
     }
 }
