@@ -7,3 +7,11 @@ create table t_student(
     create_time date,
     update_time date
 );
+create table t_student_map_card_no_sname(
+    card_no_sname varchar(30) primary key,
+    sid bigint
+);
+create table t_student_map_mobile(
+    mobile varchar(30) primary key,
+    sid bigint
+);

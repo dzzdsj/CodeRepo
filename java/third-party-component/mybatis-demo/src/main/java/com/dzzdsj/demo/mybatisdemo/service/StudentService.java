@@ -1,6 +1,5 @@
 package com.dzzdsj.demo.mybatisdemo.service;
 
-import com.dzzdsj.demo.mybatisdemo.annotation.routemap.RouteMapMapper;
 import com.dzzdsj.demo.mybatisdemo.entity.Student;
 
 import java.util.List;

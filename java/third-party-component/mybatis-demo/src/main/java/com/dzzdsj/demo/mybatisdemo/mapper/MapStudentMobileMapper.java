@@ -5,8 +5,8 @@ import com.dzzdsj.demo.mybatisdemo.annotation.routemap.RouteMapMapper;
 
 import java.util.List;
 
-@RouteMapMapper(targetTable = "t_student", mapKeys = {"card_no", "sname"},routeMapperClass = MapStudentCardNoSnameMapper.class)
-public interface MapStudentCardNoSnameMapper extends BaseRouteMapMapper<Long, String>{
+@RouteMapMapper(targetTable = "t_student", mapKeys = {"mobile"},routeMapperClass = MapStudentMobileMapper.class)
+public interface MapStudentMobileMapper extends BaseRouteMapMapper<Long, String>{
     @RouteMap(targetClass = StudentMapper.class)
     List<Long> getShardkeys(String mapKey);
 }
