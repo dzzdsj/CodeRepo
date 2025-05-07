@@ -7,6 +7,7 @@ import com.dzzdsj.demo.mybatisdemo.mapper.BaseRouteMapMapper;
 import com.dzzdsj.demo.mybatisdemo.mapper.MapStudentCardNoSnameMapper;
 import com.dzzdsj.demo.mybatisdemo.mapper.MapStudentMobileMapper;
 import com.dzzdsj.demo.mybatisdemo.service.BaseRouteMapService;
+import com.dzzdsj.demo.mybatisdemo.utils.NamingConverter;
 import jakarta.annotation.Resource;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -61,6 +62,10 @@ public class RouteMapAspect {
             key = key + mapKey + ",";
         }
         key = key.substring(0,key.length()-1);
+
+        String argsString = getArgsString(mapKeys,paramMap);
+        System.out.println("argsString: " + argsString);
+
         RouteMapInfo routeMapInfo = routeMapConfig.routeMapInfoMap.get(key);
         if(routeMapInfo != null){
             Class<?> routeMapperClass = routeMapInfo.getRouteMapperClass();
@@ -68,11 +73,22 @@ public class RouteMapAspect {
 
             SqlSession sqlSession = sqlSessionFactory.openSession();
             BaseRouteMapMapper baseRouteMapMapper = (BaseRouteMapMapper) sqlSession.getMapper(routeMapperClass);
-            List<String> shardkeys = baseRouteMapMapper.getShardkeys("s0001,Jerry");
+            List<Long> shardkeys = baseRouteMapMapper.getShardkeys(argsString);
 
             Class<?> targetMapperClass = routeMapInfo.getTargetMapperClass();
             String targetMapperMethod = routeMapInfo.getTargetMapperMethod();
         }
         return proceedingJoinPoint.proceed();
+    }
+    private String getArgsString(String[] mapKeys,Map<String,Object> paramMap){
+        StringBuilder sb = new StringBuilder();
+        for (String mapKey : mapKeys){
+            mapKey = NamingConverter.underlineToCamel(mapKey);
+            if(paramMap.get(mapKey) != null){
+                sb.append(paramMap.get(mapKey)).append(",");
+            }
+        }
+        sb.deleteCharAt(sb.length()-1);
+        return sb.toString();
     }
 }
