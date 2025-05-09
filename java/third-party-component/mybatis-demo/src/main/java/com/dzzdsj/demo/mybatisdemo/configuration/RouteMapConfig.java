@@ -47,7 +47,7 @@ public class RouteMapConfig {
                         }
                         key = key.substring(0, key.length() - 1);
 
-                        Method[] methods = clazz.getMethods();
+                        Method[] methods = clazz.getDeclaredMethods();
                         for (Method method : methods) {
                             if(method.isAnnotationPresent(RouteMap.class)){
                                 RouteMapInfo routeMapInfo = new RouteMapInfo();

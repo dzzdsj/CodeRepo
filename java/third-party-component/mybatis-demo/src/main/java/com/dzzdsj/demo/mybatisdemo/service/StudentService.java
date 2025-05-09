@@ -9,4 +9,6 @@ public interface StudentService {
     Student selectByPrimaryKey(Long sid);
 
     List<Student> findStudentsByCardNoAndName(String cardNo, String sname);
+    List<Student> findByMobile(String mobile);
+
 }

@@ -19,12 +19,27 @@
     from t_student
     where sid = #{sid,jdbcType=BIGINT}
   </select>
+  <select id="queryByShardKeys" resultMap="BaseResultMap" parameterType="java.util.List">
+    select
+    <include refid="Base_Column_List" />
+    from t_student
+    where sid in
+    <foreach collection="shardKeys" item="sid" open="(" separator="," close=")">
+      #{sid,jdbcType=BIGINT}
+    </foreach>
+  </select>
   <select id="selectByCardNoAndName" resultMap="BaseResultMap">
     SELECT
     <include refid="Base_Column_List" />
     FROM t_student
     WHERE card_no = #{cardNo,jdbcType=VARCHAR}
     AND sname = #{sname,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByMobile" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM t_student
+    WHERE mobile = #{mobile,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     delete from t_student

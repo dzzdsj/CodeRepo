@@ -24,4 +24,9 @@ public class StudentController {
     public List<Student> findByCardNoAndName(@RequestParam String cardNo, @RequestParam String sname){
         return studentService.findStudentsByCardNoAndName(cardNo, sname);
     }
+
+    @GetMapping("/findByMobile")
+    public List<Student> findByMobile(@RequestParam String mobile){
+        return studentService.findByMobile(mobile);
+    }
 }

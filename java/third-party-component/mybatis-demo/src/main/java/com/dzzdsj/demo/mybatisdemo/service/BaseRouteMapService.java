@@ -5,5 +5,5 @@ import com.dzzdsj.demo.mybatisdemo.mapper.BaseRouteMapMapper;
 import java.util.List;
 
 public interface BaseRouteMapService {
-    <T,K> List<T> getShardkeys(BaseRouteMapMapper<T,K> routeMapMapper, K mapKey);
+    <T,K> List<T> getShardkeys(BaseRouteMapMapper baseRouteMapMapper,K mapKey);
 }

@@ -22,4 +22,9 @@ public class StudentServiceImpl implements StudentService {
     public List<Student> findStudentsByCardNoAndName(String cardNo, String sname) {
         return studentMapper.selectByCardNoAndName(cardNo, sname);
     }
+    @Override
+    @EnableRouteMap(targetTable = "t_student", mapKeys = {"mobile"})
+    public List<Student> findByMobile(String mobile) {
+        return studentMapper.selectByMobile(mobile);
+    }
 }

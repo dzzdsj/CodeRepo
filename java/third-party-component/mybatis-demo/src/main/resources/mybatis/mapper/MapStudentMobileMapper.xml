@@ -26,7 +26,7 @@
     WHERE card_no = #{cardNo,jdbcType=VARCHAR}
     AND sname = #{sname,jdbcType=VARCHAR}
   </select>
-  <select id="getShardkeys" resultMap="BaseResultMap">
+  <select id="getShardkeys" resultType="java.lang.Long">
     SELECT
     sid
     FROM t_student_map_mobile

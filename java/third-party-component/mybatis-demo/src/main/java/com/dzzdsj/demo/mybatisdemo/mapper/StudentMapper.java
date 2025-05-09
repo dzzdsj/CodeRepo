@@ -10,7 +10,7 @@ import java.util.List;
 
 @ClassAnnotation(value = "studentMapper")
 //@RouteMapMapper(targetTable = "t_student", mapKeys = {"card_no", "sname"})//无效
-public interface StudentMapper {
+public interface StudentMapper extends BaseMapper<Student,  Long>{
     int deleteByPrimaryKey(Long sid);
 
     int insert(Student record);
@@ -21,6 +21,11 @@ public interface StudentMapper {
     Student selectByPrimaryKey(@Param("sid") Long sid);
 
     List<Student> selectByCardNoAndName(@Param("cardNo") String cardNo, @Param("sname") String sname);
+    List<Student> selectByMobile(@Param("mobile") String mobile);
+
+    @Override
+    List<Student> queryByShardKeys(List<Long> shardKeys);
+
     int updateByPrimaryKeySelective(Student record);
 
     int updateByPrimaryKey(Student record);
