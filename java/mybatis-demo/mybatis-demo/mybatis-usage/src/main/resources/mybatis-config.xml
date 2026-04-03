@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration><!--全局配置文件，9个子节点-->
+    <!--1. 引入属性文件-->
+    <properties resource="db.properties"/>
+    <!--2. 配置    -->
+    <settings>
+        <setting name="cacheEnabled" value="true"/><!---->
+    </settings>
+<!--    3. 别名-->
+<!--    <typeAliases>-->
+<!--        <typeAlias alias="User" type="com.dzzdsj.pojo.User"/>&lt;!&ndash;逐个配置&ndash;&gt;-->
+<!--        <package name="com.dzzdsj.pojo"/>&lt;!&ndash;批量配置&ndash;&gt;-->
+<!--    </typeAliases>-->
+    <!--4. 配置JDBC和java类型转换器，支持自定义-->
+<!--    <typeHandlers>-->
+<!--        &lt;!&ndash;方式1. 实现org.apache.ibatis.type.TypeHandler接口&ndash;&gt;-->
+<!--        &lt;!&ndash;方式2. 继承org.apache.ibatis.type.BaseTypeHandler类&ndash;&gt;-->
+<!--        <typeHandler handler=""/>-->
+<!--    </typeHandlers>-->
+    <!--5. 自定义对象工厂-->
+    <!--继承DefaultObjectFactory类自定义对象工厂-->
+<!--    <objectFactory type="com.dzzdsj.objectFactory.MyObjectFactory"/>-->
+    <!--6. 配置插件-->
+<!--    <plugins></plugins>-->
+    <!--7. 配置数据库连接环境-->
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <!--使用配置文件属性-->
+                <property name="driver" value="${db.driver}"/>
+                <property name="url" value="${db.url}"/>
+                <property name="username" value="${db.username}"/>
+                <property name="password" value="${db.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <!--8. 配置厂商标识，可让mybatis根据不同的数据库执行不同的sql-->
+<!--    <databaseIdProvider type=""/>-->
+    <!--9. 配置映射文件-->
+    <mappers>
+<!--        <mapper resource="com/dzzdsj/mapper/UserMapper.xml"/>&lt;!&ndash;配置单个映射文件&ndash;&gt;-->
+        <package name="com.dzzdsj.mapper"/><!--批量配置映射文件-->
+    </mappers>
+</configuration>

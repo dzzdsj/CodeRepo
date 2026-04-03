@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dzzdsj.mapper.UserMapper">
+    <select id="selectById" parameterType="Integer" resultType="com.dzzdsj.pojo.User">
+        select * from user where id = #{id}
+    </select>
+    <select id="selectAll" resultType="com.dzzdsj.pojo.User">
+        select * from user
+    </select>
+    <select id="queryUserMapById" resultType="java.util.HashMap">
+        select * from user where id = #{id}
+    </select>
+    <select id="queryAllUserMap" resultType="com.dzzdsj.pojo.User">
+        select * from user
+    </select>
+    <select id="queryUserByLike" resultType="com.dzzdsj.pojo.User">
+<!--三种模糊匹配写法        -->
+<!--        select * from user where username like '%${value}%'-->
+<!--        select * from user where username like "%"#{value}"%"-->
+        select * from user where username like concat('%',#{value},'%')
+    </select>
+</mapper>
