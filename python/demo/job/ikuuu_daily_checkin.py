@@ -11,14 +11,10 @@ if __name__ == "__main__":
     # server酱
     SCKEY = os.environ.get('SCKEY')
 
-    # login_url = 'https://ikuuu.art/auth/login'
-    # check_url = 'https://ikuuu.art/user/checkin'
-    # info_url = 'https://ikuuu.art/user/profile'
-
-    login_url = 'https://ikuuu.nl/auth/login'
-    check_url = 'https://ikuuu.nl/user/checkin'
-    info_url = 'https://ikuuu.nl/user/profile'
-
+    login_url = 'https://ikuuu.fyi/auth/login'
+    check_url = 'https://ikuuu.fyi/user/checkin'
+    info_url = 'https://ikuuu.fyi/user/profile'
+    # https: // ikuuu.win / auth / login
     header = {
             'origin': 'https://ikuuu.art',
             'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36'
