@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ollama 本地模型列表</title>
+</head>
+<body>
+    <h1>Ollama 本地模型列表</h1>
+
+    {% if error %}
+    <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    {% if models %}
+    <ul>
+        {% for model in models %}
+        <li>{{ model.name }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>未找到本地模型。</p>
+    {% endif %}
+
+</body>
+</html>

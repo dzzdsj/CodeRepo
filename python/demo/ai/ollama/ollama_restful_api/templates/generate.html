@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Ollama WebSocket 会话 (逐 Token 流式输出)</title>
+    <style>
+        body { font-family: sans-serif; }
+        .container { width: 80%; margin: 0 auto; }
+        #response-area {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            height: 300px;
+            overflow-y: scroll;
+            white-space: pre-wrap;
+        }
+        #input-form { display: flex; }
+        #message-input { flex-grow: 1; padding: 8px; }
+        button { padding: 8px 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ollama WebSocket 会话 (逐 Token 流式输出)</h1>
+
+        <div id="response-area">
+            </div>
+
+        <form id="input-form">
+            <input type="text" id="message-input" name="message" placeholder="输入你的消息..." required>
+            <button type="submit">发送</button>
+        </form>
+    </div>
+
+    <script>
+        const responseArea = document.getElementById('response-area');
+        const messageInput = document.getElementById('message-input');
+        const inputForm = document.getElementById('input-form');
+
+        let websocket;
+
+        function connectWebSocket() {
+            websocket = new WebSocket('ws://127.0.0.1:8765'); // WebSocket 服务器地址
+
+            websocket.onopen = function(event) {
+                console.log("WebSocket connection opened:", event);
+                responseArea.innerHTML += "<br>--- WebSocket 连接已建立 ---<br>";
+            };
+
+            websocket.onmessage = function(event) {
+                console.log("WebSocket message received:", event);
+                const data = JSON.parse(event.data);
+                let responsePart = data.response || "";
+                responsePart = responsePart.replace(/\n/g, '<br>');
+                responseArea.innerHTML += responsePart;
+                responseArea.scrollTop = responseArea.scrollHeight; // 自动滚动到底部
+
+                if (data.done) {
+                    responseArea.innerHTML += "<br>--- Generation completed ---<br>";
+                }
+            };
+
+            websocket.onerror = function(error) {
+                console.error("WebSocket error:", error);
+                responseArea.innerHTML += "<br>--- WebSocket 连接错误 ---<br>";
+            };
+
+            websocket.onclose = function(event) {
+                console.log("WebSocket connection closed:", event);
+                responseArea.innerHTML += "<br>--- WebSocket 连接已关闭 ---<br>";
+            };
+        }
+
+        connectWebSocket(); //  页面加载时建立 WebSocket 连接
+
+        inputForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const prompt = messageInput.value;
+            responseArea.innerHTML = ''; // 清空回复区域
+            messageInput.value = '';
+
+            if (!prompt.trim()) return;
+
+            if (websocket.readyState === WebSocket.OPEN) {
+                websocket.send(JSON.stringify({ message: prompt })); //  通过 WebSocket 发送用户消息
+                responseArea.innerHTML += "<br>User: " + prompt + "<br>"; // 显示用户消息
+            } else {
+                responseArea.innerHTML += "<br>--- WebSocket 连接未建立，请刷新页面 ---<br>";
+            }
+        });
+    </script>
+</body>
+</html>

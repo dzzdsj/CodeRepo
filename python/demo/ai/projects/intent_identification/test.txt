@@ -1,0 +1,6 @@
+curl -X POST -H "Content-Type: application/json" -d '{"prompt": "将/documents目录中的所有源代码文件的注释翻译成日文"}' http://localhost:5001/identify_intent
+
+curl -X POST -H "Content-Type: application/json" -d '{"prompt": "给我画一个小孩在嬉戏的图像"}' http://localhost:5001/identify_intent
+
+curl -X POST -H "Content-Type: application/json" -d '{"prompt": "为文档【/documents/abc.txt】 配一个400*200的图"}' http://localhost:5001/identify_intent
+

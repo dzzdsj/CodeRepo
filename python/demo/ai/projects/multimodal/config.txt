@@ -1,0 +1,6 @@
+base_url = http://192.168.31.208:11434/v1
+api_key = ollama
+model = qwen2.5:1.5b
+
+intent_identification_url = http://localhost:5001/identify_intent
+txt2img_url = http://192.168.31.80:7860/sdapi/v1/txt2img

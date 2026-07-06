@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>逐字显示效果</title>
+
+
+    <style>
+       /* 设置 #output 区域宽度和高度 */
+       #output {
+            width: 80%;
+            height: 300px;
+       
+            padding: 10px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin: 20px auto;  /* 使 #output 居中 */
+        }
+
+        /* 设置输入框和按钮总宽度与 #output 区域一致 */
+        #message-form {
+            width: 80%;
+            margin: 20px auto;
+            display: flex;
+            align-items: center; /* 垂直居中 */
+        }
+
+        /* 输入框宽度设置为除按钮宽度外的剩余部分 */
+        #input {
+            width: calc(80% - 60px);  /* 减去按钮宽度 */
+            padding: 5px;
+            box-sizing: border-box;  /* 包括 padding 在内计算宽度 */
+        }
+
+        /* 设置按钮的固定宽度 */
+        #send {
+            padding: 5px;
+            margin-left: 10px;
+            width: 60px;  /* 固定按钮宽度 */
+            box-sizing: border-box;
+        }
+
+        /* 确保输入框和按钮在同一行，flex 布局 */
+        #message-form input,
+        #message-form button {
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>DeepSeek会话</h1>
+    <form method="POST" action="/" id="message-form">
+        <input type="text" id="input" name="message" placeholder="请输入您的问题" required>
+        <button type="submit" id="send">发送</button>
+    </form>
+
+    <div id="output"></div>
+
+    <script>
+        const output = document.getElementById('output');
+        const sendButton = document.getElementById('send');
+        const form = document.getElementById('message-form');
+        let eventSource;
+        function escapeHTML(str) {
+            return str.replace(/[&<>"' \t\n\r\f\v]/g, function (match) {
+                const escapeMap = {
+                    '&': '&amp;',  // 修正 & 的转义
+                    '<': '&lt;',   // 修正 < 的转义
+                    '>': '&gt;',   // 修正 > 的转义
+                    '"': '&quot;',
+                    "'": '&#39;',
+                    ' ': '&nbsp;',
+                    '\t': '&nbsp;&nbsp;&nbsp;&nbsp;', // 将制表符替换为四个空格，更直观
+                    '\n': '<br/>',  // 将换行符替换为 HTML 换行标签 <br/>
+                    '\r': '',       // 忽略回车符（通常与 \n 一起使用）
+                    '\f': '&#12;',  // 换页符
+                    '\v': '&#11;'   // 垂直制表符
+                };
+                return escapeMap[match];
+            });
+        }
+      
+        // 当表单提交时
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();  // 阻止表单的默认提交行为
+
+            const userInput = document.getElementById('input').value.trim();
+            if (userInput) {
+                output.textContent = ''; // 清空输出区域
+
+                // 清空输入框
+                document.getElementById('input').value = '';
+
+                // 使用 fetch 发送 POST 请求并获取流式数据
+                fetch('/stream', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: 'prompt=' + encodeURIComponent(userInput)
+                })
+                    .then(response => {
+                        const reader = response.body.getReader();
+                        const decoder = new TextDecoder();
+                        let decoderStream = new ReadableStream({
+                            start(controller) {
+                                function push() {
+                                    reader.read().then(({ done, value }) => {
+                                        if (done) {
+                                            controller.close();
+                                            return;
+                                        }
+                                        // 将流的部分数据解码并逐字显示
+                                        const text = decoder.decode(value, { stream: true });
+                                       
+                                       
+                                        output.innerHTML += escapeHTML(text);
+                              
+                               
+                                       
+
+                                        push();
+                                    });
+                                }
+                                push();
+                            }
+                        });
+                        return new Response(decoderStream);
+                    })
+                    .catch(error => {
+                        console.error("请求错误:", error);
+                    });
+            }
+        });
+    </script>
+</body>
+
+</html>
