@@ -137,6 +137,11 @@ def main():
         action='store_true',
         help="Fast mode: skip full MD5 verification (uses size + head/tail hash only)"
     )
+    parser.add_argument(
+        '--visual',
+        action='store_true',
+        help="Visual mode: find duplicates by visual content (handles watermark, ads, transcoding)"
+    )
     
     # Exclusivity group for deletion strategy
     delete_group = parser.add_mutually_exclusive_group()
@@ -157,11 +162,18 @@ def main():
     target_dirs = [os.path.abspath(d) for d in args.dir]
     
     print(f"Scanning directories: {', '.join(target_dirs)}")
-    if args.fast:
+    if args.visual:
+        print("👁️  Visual mode active: using dHash + ffmpeg to identify content duplicates.")
+    elif args.fast:
         print("⚡ Fast mode active: skipping full MD5 verification.")
     
     finder = DuplicateFinder()
-    duplicates = finder.find_duplicates(target_dirs, show_progress=True, fast_mode=args.fast)
+    duplicates = finder.find_duplicates(
+        target_dirs, 
+        show_progress=True, 
+        fast_mode=args.fast,
+        visual_mode=args.visual
+    )
     
     report_duplicates(duplicates, output_json=args.json)
     

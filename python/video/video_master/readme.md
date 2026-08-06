@@ -11,6 +11,8 @@ python3 main.py -d /path/to/your/videos --delete-keep-first
 python3 main.py -d /path/to/your/videos --json report.json
 #快速查重模式（高速度，适合TB级或超大视频文件扫描） 添加 --fast 参数。程序会跳过第二步的全文件完整读取与验证，仅比对文件大小和头尾 64KB 哈希，速度将提升成百上千倍：
 python3 main.py -d /path/to/your/videos --fast
+#基于视频画面的视觉查重模式！通过此项功能，您将能够识别出文件名不同、分辨率不同、转码过以及首尾插入了广告的重复视频。
+python3 main.py -d /path/to/your/videos --visual
 ##test
 python3 main.py -d   /Volumes/mm
 ```
