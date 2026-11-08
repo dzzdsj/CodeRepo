@@ -8,14 +8,14 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import axios from 'axios'
+import request from '@/api/request'
 
 const health = ref('检测中...')
 
 onMounted(async () => {
   try {
-    const res = await axios.get('/api/v1/health')
-    health.value = res.data?.status ?? 'unknown'
+    const res = (await request.get('/health')) as { status?: string }
+    health.value = res?.status ?? 'unknown'
   } catch {
     health.value = '后端未启动'
   }

@@ -4,4 +4,6 @@ __pycache__/
 venv/
 .env
 *.sqlite3
+*.db
+*.db-journal
 .pytest_cache/

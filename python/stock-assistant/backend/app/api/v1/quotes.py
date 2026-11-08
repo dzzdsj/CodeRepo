@@ -42,15 +42,30 @@ async def get_indicators(code: str) -> dict:
 @router.get("/kline/{code}")
 async def get_kline(
     code: str,
-    days: int = Query(default=60, ge=10, le=365),
+    days: int = Query(default=250, ge=10, le=10000),
 ) -> dict:
-    """获取日 K 线数据（用于告警历史详情 K 线图）。"""
+    """获取日 K 线数据（前复权，按日期升序）。
+
+    days 最大 10000；腾讯源单段约 800 根，超出时后端自动分段翻页拼接。
+    """
     kline = await data_source.fetch_daily_kline(code, days)
     return {
         "code": code,
         "days": days,
         "count": len(kline),
         "data": kline,
+    }
+
+
+@router.get("/intraday/{code}")
+async def get_intraday(code: str) -> dict:
+    """获取当日分时数据（1 分钟粒度，含均价线与昨收）。"""
+    result = await data_source.fetch_intraday(code)
+    return {
+        "code": code,
+        "preClose": result.get("preClose", 0.0),
+        "count": len(result.get("data", [])),
+        "data": result.get("data", []),
     }
 
 

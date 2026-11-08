@@ -4,6 +4,7 @@ import { useWatchlistStore } from '@/stores/watchlist'
 import { useQuoteStore } from '@/stores/quotes'
 import { ColorText } from '@/components/ColorText'
 import FundFlowCard from '@/components/FundFlowCard'
+import StockChartCard from '@/components/StockChartCard'
 import {
   Search,
   Plus,
@@ -14,6 +15,7 @@ import {
   FolderOpen,
   Pencil,
   Activity,
+  CandlestickChart,
   CheckSquare,
   Square,
 } from 'lucide-react'
@@ -43,6 +45,9 @@ export default function Watchlist() {
 
   // 资金流向展开状态
   const [expandedFundFlow, setExpandedFundFlow] = useState<string | null>(null)
+
+  // 行情图表（分时/日K）展开状态
+  const [expandedChart, setExpandedChart] = useState<string | null>(null)
 
   // 批量选择
   const [selectedCodes, setSelectedCodes] = useState<Set<string>>(new Set())
@@ -380,6 +385,7 @@ export default function Watchlist() {
                       {groupItems.map((it) => {
                         const q = quotes[it.code]
                         const isFundFlowExpanded = expandedFundFlow === it.code
+                        const isChartExpanded = expandedChart === it.code
                         return (
                           <Fragment key={it.id}>
                             <tr
@@ -422,6 +428,21 @@ export default function Watchlist() {
                                 <div className="flex items-center justify-center gap-1">
                                   <button
                                     onClick={() =>
+                                      setExpandedChart(
+                                        isChartExpanded ? null : it.code,
+                                      )
+                                    }
+                                    className={`rounded p-1 transition-colors ${
+                                      isChartExpanded
+                                        ? 'bg-accent/20 text-accent'
+                                        : 'text-gray-500 hover:bg-base-600 hover:text-accent'
+                                    }`}
+                                    title="分时图 / K线"
+                                  >
+                                    <CandlestickChart size={15} />
+                                  </button>
+                                  <button
+                                    onClick={() =>
                                       setExpandedFundFlow(
                                         isFundFlowExpanded ? null : it.code,
                                       )
@@ -445,6 +466,13 @@ export default function Watchlist() {
                                 </div>
                               </td>
                             </tr>
+                            {isChartExpanded && (
+                              <tr>
+                                <td colSpan={7} className="bg-base-800 p-4">
+                                  <StockChartCard code={it.code} name={it.name} />
+                                </td>
+                              </tr>
+                            )}
                             {isFundFlowExpanded && (
                               <tr>
                                 <td colSpan={7} className="bg-base-800 p-4">

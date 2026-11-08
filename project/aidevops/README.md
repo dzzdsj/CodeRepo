@@ -169,12 +169,22 @@ aidevops/
 ├── backend/                     # 后端项目（FastAPI）
 │   ├── app/
 │   │   ├── api/v1/              # API路由层（router.py 聚合）
-│   │   ├── core/                # 核心配置（config.py）
-│   │   ├── models/              # 数据模型
+│   │   ├── core/                # 核心基础设施
+│   │   │   ├── config.py        # 配置（环境变量/.env 唯一数据源）
+│   │   │   ├── database.py      # 引擎/会话/Base/get_db
+│   │   │   ├── security.py      # bcrypt 密码哈希 + JWT
+│   │   │   ├── response.py      # 统一响应体 {code,msg,data}
+│   │   │   ├── exceptions.py    # 业务异常 + 全局异常处理
+│   │   │   └── logging.py       # 日志配置
+│   │   ├── models/              # ORM模型（__init__ 聚合导出）
 │   │   ├── schemas/             # Pydantic模式
 │   │   ├── services/            # 业务逻辑层
 │   │   ├── ai/                  # AI能力层（llm/rag/agents 后续扩展）
-│   │   └── main.py              # 应用入口（CORS + 路由注册）
+│   │   └── main.py              # 应用入口（CORS + 异常处理 + 路由）
+│   ├── alembic/                 # 数据库迁移（env.py 读取应用配置）
+│   │   └── versions/
+│   ├── alembic.ini
+│   ├── .env.example             # 环境变量模板（复制为 .env 使用）
 │   ├── requirements.txt
 │   └── .gitignore
 │
@@ -186,11 +196,14 @@ aidevops/
 ### 启动方式
 
 ```bash
-# 后端（端口 8000）
+# 后端（端口 8000；默认 SQLite，零外部依赖）
 cd backend
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+cp .env.example .env             # 生产环境务必修改 JWT_SECRET_KEY
+alembic upgrade head             # 初始化数据库表
 uvicorn app.main:app --reload
+# 模型变更后生成迁移：alembic revision --autogenerate -m "xxx"
 
 # 前端（端口 5173，/api 自动代理到后端）
 cd frontend

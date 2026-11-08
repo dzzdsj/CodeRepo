@@ -2,3 +2,11 @@ fastapi>=0.110
 uvicorn[standard]>=0.29
 pydantic>=2.6
 pydantic-settings>=2.2
+SQLAlchemy>=2.0
+alembic>=1.13
+PyJWT>=2.8
+bcrypt>=4.1
+httpx>=0.27
+
+# 生产环境使用 PostgreSQL 时按需安装（驱动需与 DATABASE_URL 对齐）：
+# psycopg[binary]>=3.1

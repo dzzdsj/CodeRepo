@@ -17,6 +17,7 @@ import type {
   AiProvider,
   AiTestResult,
   KlineResponse,
+  IntradayResponse,
   FundFlowResponse,
   SectorFundFlowResponse,
 } from '@/types'
@@ -55,8 +56,10 @@ export const api = {
   // 行情
   getRealtimeQuotes: () => request<Quote[]>(`/quotes/realtime`),
   getRealtimeIndexes: () => request<IndexQuote[]>(`/indexes/realtime`),
-  getKline: (code: string, days = 60) =>
+  getKline: (code: string, days = 250) =>
     request<KlineResponse>(`/quotes/kline/${code}?days=${days}`),
+  getIntraday: (code: string) =>
+    request<IntradayResponse>(`/quotes/intraday/${code}`),
   getFundFlow: (code: string, days = 30) =>
     request<FundFlowResponse>(`/quotes/fund-flow/${code}?days=${days}`),
   getSectorFundFlow: (sectorType: 'industry' | 'concept' = 'industry', limit = 50) =>

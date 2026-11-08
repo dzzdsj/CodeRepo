@@ -1,6 +1,16 @@
-"""AkShare 数据源适配层：实时行情、大盘指数、股票模糊搜索。
+"""行情数据采集层：统一封装腾讯财经 / 东方财富公开接口与 AkShare，向上提供
+实时行情、大盘指数、股票搜索、日 K 线、当日分时、个股 / 板块资金流向。
 
-AkShare 是同步库，所有调用通过 asyncio.to_thread 放到线程中执行，避免阻塞事件循环。
+数据源策略（主 → 备，失败自动降级，具体映射见 README「数据源说明」）：
+- 实时行情 / 指数 / 搜索 / 日 K：腾讯公开行情接口为主，AkShare 兜底
+- 当日分时：东方财富 trends2 为主，腾讯分时接口兜底
+- 板块资金流：东方财富 push2；个股资金流：AkShare（底层为东财）
+
+单位口径：实时行情 Quote 成交量换算为「股」、成交额换算为「元」
+（腾讯原始字段为手 / 万元）；日 K 与分时序列的成交量保留源口径「手」。
+
+并发模型：第三方接口与 AkShare 均为同步调用，通过 asyncio.to_thread 放到线程池，
+避免阻塞 FastAPI 事件循环。
 
 网络说明：macOS 系统代理（Clash 等）会导致 Python requests 出现 ProxyError，
 通过 monkeypatch requests.Session.request 在原生请求失败后回退到 curl 子进程，
@@ -593,37 +603,14 @@ async def check_connectivity() -> bool:
 
 
 # ══════════════════════════════════════════════════════════════════════
-#  日 K 线历史
+#  日 K 线历史（腾讯 fqkline 前复权为主，AkShare 为备；长历史分段翻页）
 # ══════════════════════════════════════════════════════════════════════
 
 
-def _fetch_tencent_kline_sync(code: str, days: int = 60) -> list[dict[str, Any]]:
-    """同步：腾讯日 K 线接口（主数据源，稳定可靠）。
-
-    接口：https://web.ifzq.gtimg.cn/appstock/app/fqkline/get
-    返回 list of {time, date, open, close, high, low, volume}，按日期升序。
-    """
-    tencent_code = _tencent_code(code)
-    url = (
-        f"https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
-        f"?param={tencent_code},day,,,{days},qfq"
-    )
-    try:
-        resp = _curl_get(url, timeout=10)
-    except Exception as e:  # noqa: BLE001
-        logger.error("腾讯K线请求失败 code=%s: %s", code, e)
-        return []
-    if resp.status_code != 200:
-        logger.warning("腾讯K线 HTTP %d code=%s", resp.status_code, code)
-        return []
-
-    try:
-        data = resp.json()
-    except Exception as e:  # noqa: BLE001
-        logger.error("腾讯K线JSON解析失败 code=%s: %s", code, e)
-        return []
-
-    # 数据结构：{"data": {"sh600519": {"qfqday": [["2024-01-02","1300",...],...]}}}
+def _parse_tencent_kline_rows(
+    data: dict[str, Any], tencent_code: str
+) -> list[dict[str, Any]]:
+    """解析腾讯 fqkline 响应为 K 线 dict 列表（按日期升序）。"""
     stock_data = data.get("data", {}).get(tencent_code, {})
     kline_list = stock_data.get("qfqday") or stock_data.get("day") or []
 
@@ -647,15 +634,105 @@ def _fetch_tencent_kline_sync(code: str, days: int = 60) -> list[dict[str, Any]]
                 "close": _safe_float(item[2]),
                 "high": _safe_float(item[3]),
                 "low": _safe_float(item[4]),
-                "volume": _safe_float(item[5]) if len(item) > 5 else 0,
+                "volume": _safe_float(item[5]) if len(item) > 5 else 0.0,
             }
         )
     result.sort(key=lambda x: x["time"])
     return result
 
 
+# 腾讯 fqkline 单段实际可取上限约 800 根
+_TENCENT_KLINE_PAGE = 800
+# 分段翻页安全上限（800 × 12 ≈ 38 年交易日，覆盖 A 股全部历史）
+_TENCENT_KLINE_MAX_PAGES = 12
+
+
+def _fetch_tencent_kline_sync(code: str, days: int = 250) -> list[dict[str, Any]]:
+    """同步：腾讯日 K 线接口（主数据源，稳定可靠）。
+
+    接口：https://web.ifzq.gtimg.cn/appstock/app/fqkline/get
+    返回 list of {time, date, open, close, high, low, volume}，按日期升序。
+
+    单段最多约 800 根；days 超过 800 时以段内最早日期为 end 向前翻页，
+    按日期去重拼接（各段前复权基准一致，重叠日价格相同）。
+    """
+    tencent_code = _tencent_code(code)
+
+    def _one_page(end_date: str) -> list[dict[str, Any]]:
+        url = (
+            "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
+            f"?param={tencent_code},day,,{end_date},{_TENCENT_KLINE_PAGE},qfq"
+        )
+        try:
+            resp = _curl_get(url, timeout=12)
+        except Exception as e:  # noqa: BLE001
+            logger.error("腾讯K线请求失败 code=%s end=%s: %s", code, end_date or "latest", e)
+            return []
+        if resp.status_code != 200:
+            logger.warning(
+                "腾讯K线 HTTP %d code=%s end=%s",
+                resp.status_code, code, end_date or "latest",
+            )
+            return []
+        try:
+            data = resp.json()
+        except Exception as e:  # noqa: BLE001
+            logger.error("腾讯K线JSON解析失败 code=%s: %s", code, e)
+            return []
+        if not isinstance(data, dict):
+            return []
+        return _parse_tencent_kline_rows(data, tencent_code)
+
+    # days <= 单段上限：一次请求即可
+    if days <= _TENCENT_KLINE_PAGE:
+        url = (
+            "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
+            f"?param={tencent_code},day,,,{days},qfq"
+        )
+        try:
+            resp = _curl_get(url, timeout=10)
+        except Exception as e:  # noqa: BLE001
+            logger.error("腾讯K线请求失败 code=%s: %s", code, e)
+            return []
+        if resp.status_code != 200:
+            logger.warning("腾讯K线 HTTP %d code=%s", resp.status_code, code)
+            return []
+        try:
+            data = resp.json()
+        except Exception as e:  # noqa: BLE001
+            logger.error("腾讯K线JSON解析失败 code=%s: %s", code, e)
+            return []
+        if not isinstance(data, dict):
+            return []
+        return _parse_tencent_kline_rows(data, tencent_code)
+
+    # 长历史：分段向前翻页，按日期去重
+    by_date: dict[str, dict[str, Any]] = {}
+    end_date = ""
+    for _ in range(_TENCENT_KLINE_MAX_PAGES):
+        page = _one_page(end_date)
+        if not page:
+            break
+        added = 0
+        for row in page:
+            if row["date"] not in by_date:
+                by_date[row["date"]] = row
+                added += 1
+        earliest = page[0]["date"]
+        # 无新增日期 = 已到上市首日；拿够数量即停
+        if added == 0 or len(by_date) >= days:
+            break
+        # 下一段以本段最早日期为结束日（含当天，衔接去重）
+        if earliest == end_date:
+            break
+        end_date = earliest
+
+    result = sorted(by_date.values(), key=lambda x: x["time"])
+    return result[-days:] if days > 0 else result
+
+
 def _fetch_akshare_kline_sync(
-    code: str, days: int = 60
+    code: str, days: int = 250
 ) -> list[dict[str, Any]]:
     """同步：AkShare 获取日 K 线数据。
 
@@ -707,7 +784,7 @@ def _fetch_akshare_kline_sync(
     return result
 
 
-async def fetch_daily_kline(code: str, days: int = 60) -> list[dict[str, Any]]:
+async def fetch_daily_kline(code: str, days: int = 250) -> list[dict[str, Any]]:
     """异步获取日 K 线数据：优先腾讯接口，失败回退 AkShare。
 
     两个数据源均带重试逻辑，AkShare 偶发返回空数据时自动重试。
@@ -752,6 +829,169 @@ async def fetch_daily_kline(code: str, days: int = 60) -> list[dict[str, Any]]:
             if attempt < 2:
                 await asyncio.sleep(1)
     return []
+
+
+# ════════════════════════════════════════════════════════════════════
+#  分时行情（当日 1 分钟）
+# ════════════════════════════════════════════════════════════════════
+
+
+def _eastmoney_secid(code: str) -> str:
+    """股票代码 → 东方财富 secid：6/9 开头沪市 1.，其余（深市/北交所）0.。"""
+    if code.startswith(("6", "9")):
+        return f"1.{code}"
+    return f"0.{code}"
+
+
+def _fetch_eastmoney_intraday_sync(code: str) -> dict[str, Any]:
+    """同步：东财 trends2 当日分时（1 分钟），含分钟均价。
+
+    返回 {"preClose": float, "data": [{datetime,time,timestamp,price,avg,volume,amount}]}，
+    volume 为当分钟成交量（手）。
+    """
+    params = urlencode(
+        {
+            "secid": _eastmoney_secid(code),
+            "fields1": "f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11",
+            "fields2": "f51,f52,f53,f54,f55,f56,f57,f58",
+            "iscr": "0",
+            "ndays": "1",
+        }
+    )
+    url = f"https://push2his.eastmoney.com/api/qt/stock/trends2/get?{params}"
+    try:
+        resp = _curl_get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
+    except Exception as e:  # noqa: BLE001
+        logger.warning("东财分时请求失败 code=%s: %s", code, e)
+        return {"preClose": 0.0, "data": []}
+    if resp.status_code != 200:
+        logger.warning("东财分时 HTTP %d code=%s", resp.status_code, code)
+        return {"preClose": 0.0, "data": []}
+    try:
+        payload = resp.json().get("data") or {}
+    except Exception as e:  # noqa: BLE001
+        logger.warning("东财分时 JSON 解析失败 code=%s: %s", code, e)
+        return {"preClose": 0.0, "data": []}
+
+    pre_close = _safe_float(payload.get("preClose"))
+    points: list[dict[str, Any]] = []
+    for line in payload.get("trends") or []:
+        parts = line.split(",")
+        if len(parts) < 8:
+            continue
+        # 格式：2026-10-09 09:31, 开, 收, 高, 低, 成交量(手), 成交额(元), 均价
+        dt_str = parts[0]
+        try:
+            dt = datetime.strptime(dt_str, "%Y-%m-%d %H:%M")
+        except ValueError:
+            continue
+        points.append(
+            {
+                "datetime": dt_str,
+                "time": dt_str[11:16],
+                "timestamp": int(dt.timestamp()),
+                "price": _safe_float(parts[2]),
+                "avg": _safe_float(parts[7]),
+                "volume": _safe_float(parts[5]),
+                "amount": _safe_float(parts[6]),
+            }
+        )
+    return {"preClose": pre_close, "data": points}
+
+
+def _fetch_tencent_intraday_sync(code: str) -> dict[str, Any]:
+    """同步：腾讯当日分时（兜底）。
+
+    原始行为 "HHMM 价格 累计成交量(手) 累计成交额(元)"，
+    分钟量/分钟额由累计值差分，均价 = 累计成交额 / (累计成交量 × 100)。
+    """
+    tc = _tencent_code(code)
+    url = f"https://web.ifzq.gtimg.cn/appstock/app/minute/query?code={tc}"
+    try:
+        resp = _curl_get(url, timeout=10)
+    except Exception as e:  # noqa: BLE001
+        logger.warning("腾讯分时请求失败 code=%s: %s", code, e)
+        return {"preClose": 0.0, "data": []}
+    if resp.status_code != 200:
+        return {"preClose": 0.0, "data": []}
+    try:
+        payload = resp.json()
+        node = (payload.get("data") or {}).get(tc) or {}
+    except Exception as e:  # noqa: BLE001
+        logger.warning("腾讯分时 JSON 解析失败 code=%s: %s", code, e)
+        return {"preClose": 0.0, "data": []}
+
+    qt = (node.get("qt") or {}).get(tc) or []
+    # qt 数组第 5 项（index 4）为昨收价
+    pre_close = _safe_float(qt[4]) if len(qt) > 4 else 0.0
+
+    minute_node = node.get("data") or {}
+    raw_lines = minute_node.get("data") or []
+    date_str = str(minute_node.get("date", ""))  # YYYYMMDD
+    points: list[dict[str, Any]] = []
+    prev_vol = 0.0
+    prev_amt = 0.0
+    for line in raw_lines:
+        parts = str(line).split()
+        if len(parts) < 4 or len(date_str) != 8:
+            continue
+        hm, price_s, cum_vol_s, cum_amt_s = parts[0], parts[1], parts[2], parts[3]
+        # 仅保留连续竞价时段（含收盘集合竞价 15:00），丢弃盘后零量补点
+        if not ("0930" <= hm <= "1130" or "1300" <= hm <= "1500"):
+            continue
+        try:
+            dt = datetime.strptime(date_str + hm, "%Y%m%d%H%M")
+        except ValueError:
+            continue
+        cum_vol = _safe_float(cum_vol_s)
+        cum_amt = _safe_float(cum_amt_s)
+        price = _safe_float(price_s)
+        minute_vol = max(cum_vol - prev_vol, 0.0)
+        minute_amt = max(cum_amt - prev_amt, 0.0)
+        avg = cum_amt / (cum_vol * 100) if cum_vol > 0 else price
+        dt_str = dt.strftime("%Y-%m-%d %H:%M")
+        points.append(
+            {
+                "datetime": dt_str,
+                "time": dt_str[11:16],
+                "timestamp": int(dt.timestamp()),
+                "price": price,
+                "avg": round(avg, 3),
+                "volume": minute_vol,
+                "amount": minute_amt,
+            }
+        )
+        prev_vol, prev_amt = cum_vol, cum_amt
+    return {"preClose": pre_close, "data": points}
+
+
+async def fetch_intraday(code: str) -> dict[str, Any]:
+    """异步获取当日分时：优先东财 trends2，失败回退腾讯。
+
+    返回 {"preClose": float, "data": [...]}；两者均失败时 data 为空。
+    """
+    try:
+        result = await asyncio.wait_for(
+            asyncio.to_thread(_fetch_eastmoney_intraday_sync, code), timeout=12
+        )
+        if result.get("data"):
+            return result
+    except asyncio.TimeoutError:
+        logger.warning("东财分时超时 code=%s", code)
+    except Exception as e:  # noqa: BLE001
+        logger.warning("东财分时失败 code=%s: %s", code, e)
+
+    try:
+        result = await asyncio.wait_for(
+            asyncio.to_thread(_fetch_tencent_intraday_sync, code), timeout=12
+        )
+        if result.get("data"):
+            return result
+    except asyncio.TimeoutError:
+        logger.warning("腾讯分时超时 code=%s", code)
+    except Exception as e:  # noqa: BLE001
+        logger.warning("腾讯分时失败 code=%s: %s", code, e)
+    return {"preClose": 0.0, "data": []}
 
 
 # ════════════════════════════════════════════════════════════════════
@@ -823,110 +1063,81 @@ async def fetch_fund_flow(code: str, days: int = 30) -> list[dict[str, Any]]:
 
 
 # ════════════════════════════════════════════════════════════════════
-#  板块资金流向（东方财富 datacenter-web）
+#  板块资金流向（东方财富 push2 行情接口）
 # ════════════════════════════════════════════════════════════════════
 
 
 def _fetch_sector_fund_flow_sync(
     sector_type: str = "industry", limit: int = 50
 ) -> list[dict[str, Any]]:
-    """同步：获取板块资金流向排名（东方财富数据中心接口）。
+    """同步：获取板块资金流向排名（东方财富 push2 行情接口）。
 
-    数据源：datacenter-web.eastmoney.com 的 RPT_FUNDFLOW_BOARD 报表，
-    返回今日所有板块的资金流向数据（单位：万元）。
+    数据源：push2.eastmoney.com/api/qt/clist/get，与东财网页版"板块资金流"
+    （data.eastmoney.com/bkzj）同源，含板块涨跌幅，金额单位为元。
 
     Args:
-        sector_type: 'industry' = 行业板块, 'concept' = 概念板块
-                     （注：当前接口不区分行业/概念，返回全部板块）
+        sector_type: 'industry' = 行业板块 (m:90+t:2),
+                     'concept'  = 概念板块 (m:90+t:3)
         limit: 返回数量上限
 
     Returns:
         板块资金流向列表，按主力净流入降序排列
     """
-    today = datetime.now().strftime("%Y-%m-%d")
-    filter_str = f"(TRADE_DATE>='{today}')"
-    params = urlencode(
-        {
-            "reportName": "RPT_FUNDFLOW_BOARD",
-            "columns": "ALL",
-            "filter": filter_str,
-            "pageNumber": "1",
-            "pageSize": str(max(limit, 100)),
-            "sortColumns": "NET_INFLOW",
-            "sortTypes": "-1",
-        }
-    )
-    url = f"http://datacenter-web.eastmoney.com/api/data/v1/get?{params}"
-    try:
-        resp = _curl_get(url, timeout=15, headers={"User-Agent": "Mozilla/5.0"})
-    except Exception as e:  # noqa: BLE001
-        logger.error("板块资金流向请求失败: %s", e)
-        return []
+    # 行业板块 m:90+t:2，概念板块 m:90+t:3
+    fs = "m:90+t:3" if sector_type == "concept" else "m:90+t:2"
+    fields = "f12,f14,f2,f3,f6,f62,f184,f66,f69,f72,f75,f78,f81,f84,f87"
+    pz = str(max(limit, 100))
 
-    if resp.status_code != 200:
-        logger.warning("板块资金流向 HTTP %d", resp.status_code)
-        return []
-
-    try:
-        data = resp.json()
-    except Exception as e:  # noqa: BLE001
-        logger.error("板块资金流向 JSON 解析失败: %s", e)
-        return []
-
-    if not data.get("success"):
-        logger.warning("板块资金流向接口返回失败: %s", data.get("message"))
-        return []
-
-    rows = ((data.get("result") or {}).get("data")) or []
-    result: list[dict[str, Any]] = []
-    for item in rows:
-        # 接口单位为万元，转换为元
-        main_net = _safe_float(item.get("NET_INFLOW"))
-        if main_net is not None:
-            main_net *= 10000
-        super_large = _safe_float(item.get("SUPERDEAL_AMOUNT"))
-        if super_large is not None:
-            super_large *= 10000
-        large = _safe_float(item.get("BIGDEAL_AMOUNT"))
-        if large is not None:
-            large *= 10000
-        medium = _safe_float(item.get("MIDDEAL_AMOUNT"))
-        if medium is not None:
-            medium *= 10000
-        small = _safe_float(item.get("SMALLDEAL_AMOUNT"))
-        if small is not None:
-            small *= 10000
-        amount = _safe_float(item.get("AMOUNT"))
-        if amount is not None:
-            amount *= 10000
-
-        # 粗略区分行业/概念板块：名称含"概念/风格/指数/组合"归为概念板块
-        name = str(item.get("BOARD_NAME", "")).strip()
-        concept_keywords = ("概念", "风格", "指数", "组合", "茅", "宁", "经济")
-        is_concept = any(kw in name for kw in concept_keywords)
-        if sector_type == "industry" and is_concept:
-            continue
-        if sector_type == "concept" and not is_concept:
-            continue
-
-        result.append(
+    def _request(order: str) -> list[dict[str, Any]]:
+        """order='1' 主力净流入降序（流入榜），'0' 升序（流出榜）。"""
+        params = urlencode(
             {
-                "code": str(item.get("BOARD_CODE1", "")),
-                "name": name,
-                "price": amount,  # 成交额作为 price 字段展示
-                "changePct": 0.0,  # 该接口无涨跌幅
-                "mainNetInflow": main_net,
-                "mainNetInflowRatio": _safe_float(item.get("INFLOW_RATIO")),
-                "superLargeNetInflow": super_large,
-                "superLargeNetInflowRatio": 0.0,
-                "largeNetInflow": large,
-                "largeNetInflowRatio": 0.0,
-                "mediumNetInflow": medium,
-                "mediumNetInflowRatio": 0.0,
-                "smallNetInflow": small,
-                "smallNetInflowRatio": 0.0,
+                "pn": "1",
+                "pz": pz,
+                "po": order,
+                "np": "1",
+                "fltt": "2",
+                "invt": "2",
+                "fid": "f62",  # 按主力净流入排序
+                "fs": fs,
+                "fields": fields,
             }
         )
+        url = f"http://push2.eastmoney.com/api/qt/clist/get?{params}"
+        try:
+            resp = _curl_get(url, timeout=15, headers={"User-Agent": "Mozilla/5.0"})
+            if resp.status_code != 200:
+                logger.warning("板块资金流向 HTTP %d", resp.status_code)
+                return []
+            data = resp.json()
+        except Exception as e:  # noqa: BLE001
+            logger.error("板块资金流向请求失败: %s", e)
+            return []
+        return ((data.get("data") or {}).get("diff")) or []
+
+    # 同时取流入榜与流出榜，按板块代码合并去重，保证两端 TOP 榜都有数据
+    merged: dict[str, dict[str, Any]] = {}
+    for item in (*_request("1"), *_request("0")):
+        code = str(item.get("f12", ""))
+        if not code or code in merged:
+            continue
+        merged[code] = {
+            "code": code,
+            "name": str(item.get("f14", "")).strip(),
+            "price": _safe_float(item.get("f2")),
+            "changePct": _safe_float(item.get("f3")),
+            "mainNetInflow": _safe_float(item.get("f62")),
+            "mainNetInflowRatio": _safe_float(item.get("f184")),
+            "superLargeNetInflow": _safe_float(item.get("f66")),
+            "superLargeNetInflowRatio": _safe_float(item.get("f69")),
+            "largeNetInflow": _safe_float(item.get("f72")),
+            "largeNetInflowRatio": _safe_float(item.get("f75")),
+            "mediumNetInflow": _safe_float(item.get("f78")),
+            "mediumNetInflowRatio": _safe_float(item.get("f81")),
+            "smallNetInflow": _safe_float(item.get("f84")),
+            "smallNetInflowRatio": _safe_float(item.get("f87")),
+        }
+    result = sorted(merged.values(), key=lambda x: x["mainNetInflow"], reverse=True)
     return result
 
 

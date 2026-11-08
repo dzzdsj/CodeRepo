@@ -191,14 +191,17 @@ export interface AiTestResult {
   message: string
 }
 
-/** K 线数据条目 */
+/** 日 K 线单根数据（前复权，按日期升序） */
 export interface KlineBar {
+  /** 当日 00:00 的 Unix 秒（lightweight-charts 时间轴用） */
   time: number
+  /** 交易日 YYYY-MM-DD */
   date: string
   open: number
   close: number
   high: number
   low: number
+  /** 成交量（手） */
   volume: number
 }
 
@@ -208,6 +211,32 @@ export interface KlineResponse {
   days: number
   count: number
   data: KlineBar[]
+}
+
+/** 分时数据条目（1 分钟粒度，交易时段 09:30–11:30 / 13:00–15:00） */
+export interface IntradayPoint {
+  /** YYYY-MM-DD HH:MM */
+  datetime: string
+  /** HH:MM（北京时间，直接用于坐标轴刻度） */
+  time: string
+  /** 该分钟的 Unix 秒（lightweight-charts 时间轴用） */
+  timestamp: number
+  /** 分钟收盘价 */
+  price: number
+  /** 截至该分钟的成交均价 */
+  avg: number
+  /** 当分钟成交量（手） */
+  volume: number
+  /** 当分钟成交额（元） */
+  amount: number
+}
+
+/** 分时 API 响应 */
+export interface IntradayResponse {
+  code: string
+  preClose: number
+  count: number
+  data: IntradayPoint[]
 }
 
 /** 单日资金流向 */

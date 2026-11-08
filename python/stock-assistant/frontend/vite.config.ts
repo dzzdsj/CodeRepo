@@ -19,11 +19,11 @@ export default defineConfig({
   ],
   server: {
     host: '0.0.0.0',
-    port: 5173,
+    port: 5183,
     proxy: {
       // REST API 代理到后端 FastAPI
       '/api': {
-        target: 'http://127.0.0.1:8000',
+        target: 'http://127.0.0.1:8010',
         changeOrigin: true,
         // WebSocket 升级支持（/api/quotes/ws）
         ws: true,

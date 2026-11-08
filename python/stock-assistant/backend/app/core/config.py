@@ -21,7 +21,7 @@ class Settings(BaseSettings):
 
     # 应用
     app_host: str = "127.0.0.1"
-    app_port: int = 8000
+    app_port: int = 8010
     app_debug: bool = True
 
     # 数据库
@@ -40,7 +40,7 @@ class Settings(BaseSettings):
     tushare_token: str = ""
 
     # CORS：前端 dev 地址
-    cors_origins: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
+    cors_origins: list[str] = ["http://localhost:5183", "http://127.0.0.1:5183"]
 
     @property
     def sqlite_path(self) -> Path:

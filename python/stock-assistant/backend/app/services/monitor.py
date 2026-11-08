@@ -126,6 +126,7 @@ class MonitorService:
         return [self._quote_cache[c] for c in codes if c in self._quote_cache]
 
     def get_indexes(self) -> list[IndexQuote]:
+        """读取缓存的大盘指数行情。"""
         return list(self._index_cache)
 
     def get_history(self, code: str) -> list[Quote]:
@@ -133,6 +134,7 @@ class MonitorService:
         return list(self._quote_history.get(code, []))
 
     def get_status(self) -> dict[str, Any]:
+        """返回调度器运行状态快照（供系统状态接口与前端状态栏展示）。"""
         return {
             "started": self._started,
             "watchlistCount": len(self._codes),
@@ -254,6 +256,7 @@ class MonitorService:
         )
 
     async def _broadcast_indexes(self, indexes: list[IndexQuote]) -> None:
+        """广播指数行情到 WebSocket 订阅者。"""
         await quotes_hub.broadcast(
             {
                 "type": "indexes",
